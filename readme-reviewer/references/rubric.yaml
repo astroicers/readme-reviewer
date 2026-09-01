@@ -1,0 +1,304 @@
+# rubric.yaml — readme-reviewer 的唯一 canonical 判準
+rubric_version: "0.1.0"
+# 版本語意:major=規則增刪 / minor=權重或標註變更 / patch=文字修訂。
+# lint_readme.py 硬編的值與本檔的一致性由其 --selftest 的 drift-guard 逐項斷言。
+
+# ════════════════════════════════════════════════════════════════════════
+# 證據性質(必讀,決定措辭紀律)
+# ════════════════════════════════════════════════════════════════════════
+#
+# ⚠️ **本 rubric 的權重與門檻是「選的」,不是「量出來的」。**
+#
+# 姊妹專案 skill-quality-research 的 packaging 權重來自 97 個 repo 的星數梯度,
+# 有 bootstrap CI 可查。**本專案沒有那個東西**,不得複製那套措辭。
+#
+# 來源是 triangulation:公開規範 + 該專案 54 份質化筆記收斂出的寫作工藝樣態。
+# 而那個專案跑完六個 phase 的結論正是
+# **「星數關聯的是打包面,不是內容工藝 —— craft 才是主判」** ——
+# 所以 craft-first + triangulation 是**遵循那個結論**,不是繞過它。
+#
+# 可以說:「這條規則的依據是 X」。
+# 不可以說:「資料顯示做這個會更受歡迎」。**我們沒有那個資料。**
+
+triangulation_sources:
+  status: |
+    ⚠️ **待查證(fact-check pending)**。下列來源是憑既有知識引用的,
+    **本輪未逐條開啟原文核對**。這一行本身就是本專案第一條誠實聲明:
+    在拿到查證前,任何「規範 X 說 Y」的引用都只有**中等**證據強度。
+    解除條件:逐條開啟原文、記錄查證日期與引用位置。
+  sources:
+    - "GitHub Docs — About READMEs(README 的定位與 GitHub 的渲染行為)"
+    - "Standard Readme(RichardLitt/standard-readme)—— 章節順序與必要段落"
+    - "Make a README(makeareadme.com)—— 最小可用 README 的組成"
+    - "Diátaxis / Divio documentation system —— tutorial / how-to / reference / explanation 四象限"
+    - "skill-quality-research 的 54 份質化筆記 —— 寫作工藝樣態(why 密度、Bad/Good 對照、override 節)"
+
+# ════════════════════════════════════════════════════════════════════════
+# observation-only:有數字,但**不得轉成權重**
+# ════════════════════════════════════════════════════════════════════════
+observation_only:
+  note: |
+    以下四項來自 skill-quality-research 的 `feature_matrix.json`(80 個 repo,
+    2026-08-16 快照)。**母體是 Agent Skill repo,不是一般 GitHub**;
+    且 T3 層只有 **n=3**。列在這裡是為了讓讀者知道「有人量過什麼」,
+    **不外推、不進計分**。本 rubric 的任何一條都不以這些數字為依據。
+  data:
+    install_oneliner_in_readme: {all: 68, T0: 50, T1: 60, T2: 71, T3: 100}
+    readme_has_metrics:         {all: 60, T0: 50, T1: 40, T2: 69, T3: 50}
+    readme_has_before_after:    {all: 39, T0: 38, T1: 40, T2: 35, T3: 67}
+    readme_has_demo_media:      {all: 24, T0: 12, T1: 20, T2: 29, T3: 17}
+
+# ════════════════════════════════════════════════════════════════════════
+# A. hygiene 門檻(確定性,不加分,error 級不過即 needs-revision)
+# ════════════════════════════════════════════════════════════════════════
+hygiene:
+  - id: H-001
+    dimension: existence
+    check_type: script
+    source: triangulation
+    rule: "存在一份非空的 README"
+    pass_criteria: "找得到 README(.md/.rst/無副檔名)且去除空白後非空"
+    severity: error
+    mechanism: "沒有 README,GitHub 首頁就沒有任何說明;這是唯一無爭議的門檻"
+
+  - id: H-002
+    dimension: structure
+    check_type: script
+    source: triangulation
+    rule: "有 H1 標題,且標題不只是 repo 名字本身"
+    pass_criteria: "存在 `# ` 開頭的一行;若標題去除標點後等於 repo 目錄名,記 warning 不記 pass"
+    severity: warning
+    mechanism: "標題是第一屏的第一個字;只寫 repo 名等於沒說"
+    known_false_positives: |
+      有些 repo 刻意用 logo 圖片取代 H1(常見於品牌型專案)。
+      偵測看不出「圖片承載了標題功能」——**這一條交給步驟 4 的 LLM 複核**,
+      lint 只負責指出「沒有文字 H1」這個事實。
+
+  - id: H-003
+    dimension: structure
+    check_type: script
+    source: triangulation
+    rule: "有安裝或使用的段落"
+    pass_criteria: "標題含 install / usage / quick start / getting started / 安裝 / 使用 / 快速開始 等"
+    severity: warning
+    mechanism: "讀者來 README 最常見的目的是「怎麼開始用」"
+    exemption: |
+      **awesome 清單型 / 純資料型 repo 判 N/A**(它們沒有「安裝」這回事)。
+      形狀判定見 SKILL.md 步驟 3。
+
+  - id: H-004
+    dimension: rendering
+    check_type: script
+    source: triangulation
+    rule: "code fence 標語言"
+    pass_criteria: "≥70% 的 ``` 區塊帶語言標註"
+    severity: info
+    mechanism: "GitHub 靠語言標註上色;不標的區塊在網頁上是一片灰"
+    threshold_is_a_choice: |
+      ⚠️ **70% 是選的,不是量出最適值。** 選它的理由:允許少量純輸出/純文字區塊
+      (那些本來就不該標語言),但不允許整份都不標。
+      **若實測誤判偏多,先懷疑這個門檻。**
+
+  - id: H-005
+    dimension: rendering
+    check_type: script
+    source: triangulation
+    rule: "repo 內的相對連結指得到東西"
+    pass_criteria: "README 內所有非 http 的 [](...) 目標在 repo 內存在"
+    severity: warning
+    mechanism: "死連結是讀者最快失去信任的地方,而且是確定性可測的"
+    detection_note: |
+      只驗**相對路徑**與 **同檔 anchor**;外部 http 連結**不驗**(需要網路,且會偽陰性)。
+      anchor 比對用 GitHub 的 slug 規則(小寫、去標點、空白轉 `-`),
+      **中日韓字元保留** —— 本專案自己的 README 就是中文標題。
+
+# ════════════════════════════════════════════════════════════════════════
+# B. craft_llm —— **主判**(lint 做不到,也不該假裝做得到)
+# ════════════════════════════════════════════════════════════════════════
+# 取值:good / mixed / poor / n/a。`n/a` 只在形狀表明文豁免時使用。
+craft_llm:
+  - id: R-001
+    dimension: first_screen
+    check_type: llm
+    source: triangulation
+    rule: "第一屏(標題 + 前 ~15 行)就回答:這是什麼、給誰、解決什麼問題"
+    pass_criteria: |
+      基礎:讀完第一屏能用一句話說出「它是什麼、我是不是目標讀者」。
+      高分:再加上**與替代方案的差別**(為什麼用它而不是別的)。
+    anti_patterns:
+      - "badge 牆先行 —— 徽章佔滿第一屏而正文還沒開始"
+      - "標題只有專案名,沒有一句話定位"
+      - "第一段先講作者動機/心路歷程,而不是讀者要什麼"
+      - "只有抽象形容詞(『強大』『優雅』『現代化』)而沒有具體能力"
+    disambiguation: |
+      「第一屏」不是精確行數,是**讀者滾動前看到的東西**。判別法:
+      **遮住第 15 行之後,問「我知道要不要繼續讀嗎」**。
+      ⚠️ badge 不是罪 —— 兩三個狀態徽章是慣例。判準是**它們有沒有把定位擠掉**。
+    mechanism: "README 的第一屏就是 skill 的 description:它決定讀者留不留下來"
+
+  - id: R-002
+    dimension: shortest_path
+    check_type: llm
+    source: triangulation
+    rule: "從零到跑起來的最短路徑是完整且可貼的"
+    pass_criteria: |
+      基礎:有可直接複製的指令,**前置條件明說**(語言版本、作業系統、必要帳號/金鑰)。
+      高分:再加上**成功長什麼樣**(預期輸出/畫面),讓讀者知道自己有沒有裝對。
+    anti_patterns:
+      - "指令有隱含前置條件(需要 Docker / 特定版本)卻沒說"
+      - "只有 `npm install`,沒有「然後呢」"
+      - "範例指令帶佔位符卻沒說去哪拿(`<YOUR_API_KEY>` 而無取得說明)"
+      - "安裝段落與實際 release/套件名不一致"
+    exemption: |
+      **研究/論文型**:若專案本身不是給人跑的(資料集、報告),R-002 判 `n/a`,
+      改由 R-004(可複現性與資料說明)承載。
+      **awesome 清單型**:判 `n/a`。
+      形狀判定見 SKILL.md 步驟 3。
+    mechanism: "讀者的第一次失敗多半發生在這裡,而失敗一次就不會有第二次"
+
+  - id: R-003
+    dimension: writing_quality
+    check_type: llm
+    source: triangulation
+    rule: "解釋 why 而非只列 what;用具體例子而非抽象形容"
+    pass_criteria: |
+      基礎:關鍵選擇附理由(為什麼這樣設計/為什麼建議這個做法);
+      有**具體例子或輸出樣張**,而不是只有形容詞。
+      高分:有 before/after 或 Bad/Good 對照,或一個能實際套用得出二元結論的判別法。
+    equivalent_forms: |
+      「具體例子」不限散文對照,以下等價計分:
+      - **輸出樣張**:貼一段真實輸出/截圖,讓讀者看到結果長什麼樣
+      - **結構化表格**:用比較表、決策表承載「這樣做/不這樣做」
+      - **可證偽的判別法**:給一個讀者能實際套用並得出是/否的測試
+    anti_patterns:
+      - "整份都是功能清單,零個例子"
+      - "『支援 X』但沒有一行 X 的用法"
+      - "changelog / 版本註記侵入正文"
+    mechanism: "解釋 why 讓讀者能在未列舉的情境下自己判斷;只列 what 只能照抄"
+
+  - id: R-004
+    dimension: honest_limits
+    check_type: llm
+    source: triangulation
+    rule: "說出什麼時候**不該**用、已知限制、以及易腐內容的時效"
+    pass_criteria: |
+      基礎:有任何一項 —— 非目標(non-goals)、已知限制、適用邊界、維護狀態。
+      高分:易腐內容(版本號、第三方 API、定價、效能數字)帶**時效標記或驗證方式**。
+    decision_order: |
+      照序判,第一個成立者為準:
+        1. 有明確的限制/非目標/適用邊界陳述 → 至少 mixed,視具體程度上調
+        2. 無上述,但也**沒有易腐內容**(純概念說明、無版本無數字)→ `n/a`
+        3. 無上述,而**有易腐內容**(版本號/API/定價/效能宣稱)→ `poor`
+      ⚠️ 順序 2 與 3 的差別是「**有沒有東西會過期**」,不是篇幅。
+    anti_patterns:
+      - "效能/準確率數字無來源、無日期、無重現方式"
+      - "宣稱支援 N 種平台/工具,而沒有任何一種有實測痕跡"
+      - "文件描述的行為與程式碼已不一致(可從版本/API 名稱看出)"
+    mechanism: |
+      README 是專案對外唯一保證會被讀的檔案,也是最容易腐爛的檔案。
+      **把限制寫出來的專案,通常也是文件會被維護的專案。**
+    evidence_note: |
+      本條的形狀直接借自 skill-quality-research 的 L-004(anti-hallucination),
+      那一條是該專案跨兩輪一致性量測中**信度最低**的維度(κ=0.400)。
+      ⚠️ **本條若過度觸發,先懷疑它,不要先調 rollup 門檻。**
+
+# ════════════════════════════════════════════════════════════════════════
+# C. security(門檻,不加分。標示 ≠ 禁止)
+# ════════════════════════════════════════════════════════════════════════
+# confidence 的值域與語意:
+#   low-static-needs-llm — regex 假陽性高,**不足以單獨支撐判定**,
+#                          必須由 SKILL.md 步驟 5 複核確認才算數。
+#   medium               — 比對命令字面而非散文語意,假陽性率最低,
+#                          **推翻它需要最強的證據,不是最弱的**。
+security:
+  - id: S-001
+    dimension: security
+    check_type: hybrid
+    rule: "`curl … | sh` 型一行安裝"
+    pass_criteria: "README 不以管道到 shell 作為**唯一或首選**安裝路徑"
+    severity: warning
+    confidence:
+      pipe_to_shell: medium
+    stance: |
+      ⚠️ **標示,不禁止。** `curl | bash` 是被廣泛使用的慣例,很多正當專案這樣做。
+      本條要的是**讀者知道自己在執行什麼**:有沒有並列非管道路徑、
+      有沒有讓人先看腳本。
+      **可查證的先例**:skill-quality-research 明文為此拒絕補上自己的
+      `install_oneliner_in_readme` 一格,理由是「一個做安全審查的工具去推廣
+      `curl | bash`,自相矛盾」—— 那是一個**專案自己的取捨**,不是通則。
+    mechanism: "管道到 shell 讓讀者無法在執行前檢視內容,擴大供應鏈面"
+
+  - id: S-002
+    dimension: security
+    check_type: hybrid
+    rule: "範例裡不出現真實憑證"
+    pass_criteria: "不出現看起來像真實 token/key 的字串"
+    severity: error
+    confidence:
+      real_looking_secret: low-static-needs-llm
+    detection_note: |
+      只認**高熵且帶已知前綴**的樣態(`ghp_`/`sk-`/`AKIA` 等)。
+      佔位符(`<YOUR_TOKEN>`、`xxx`、`...`)**不算命中**。
+      ⚠️ 假陽性高:文件在**談論**憑證格式時會命中。必須經步驟 5 複核。
+    mechanism: "README 是最容易被複製貼上的地方,誤貼的憑證會直接進版控"
+
+  - id: S-003
+    dimension: security
+    check_type: hybrid
+    rule: "不指示讀者執行未經檢視的遠端內容"
+    pass_criteria: "不出現「照著印出來的內容執行」「不要停下來確認」類指令"
+    severity: warning
+    confidence:
+      obey_remote_output: low-static-needs-llm
+    detection_note: |
+      ⚠️ 這一條在姊妹專案有**具名的極性反轉前科**:regex 曾把
+      「**DO NOT PROCEED** without confirmation」(強制確認)判成抑制確認。
+      **正向 marker 認不出否定式** —— 命中一律當低信心,交步驟 5。
+    mechanism: "把指令來源移到 README 外,靜態審查覆蓋不到實際被執行的東西"
+
+# ════════════════════════════════════════════════════════════════════════
+# D. verdict rollup —— **canonical 只有這一份**
+# ════════════════════════════════════════════════════════════════════════
+craft_verdict_rollup:
+  values: [approved, approved-with-notes, needs-revision]
+  order: |
+    照序判,第一個成立者為準:
+      1. hygiene 有 severity: error 未過                     → needs-revision
+      2. security 有 error 級紅旗且經步驟 5 複核確認成立       → needs-revision
+      3. 任一 craft 維度判 poor                              → needs-revision
+      4. ≥2 個 craft 維度判 mixed(n/a 不計入)               → needs-revision
+      5. 恰 1 個維度 mixed                                   → approved-with-notes
+      6. 其餘(無 mixed 無 poor)                             → approved
+  why_mixed_costs_from_day_one: |
+    ⚠️ **這一條是從姊妹專案的實測缺陷直接繼承來的,不是設計偏好。**
+
+    skill-quality-research 的 craft verdict 原本只有 `poor` 觸發 needs-revision,
+    而 `poor` 在 54 份質化筆記中只佔 **1.9–3.7%**。實測後果:
+    **連續 41 個對象、約 152 個維度標記,41/41 全是 `approved`** ——
+    史上零次由 craft 觸發 needs-revision。
+    三次不知情實測的 12 個維度標記是 **7 mixed / 5 good / poor 零個**,零開火。
+
+    **一個從來不說「不」的判準,從外面看跟橡皮圖章無法區分。**
+
+    ⇒ 本專案第一天就讓 `mixed` 計費。`mixed` 正是審查者用來標示「這裡有問題」的那一格。
+  threshold_is_a_choice: |
+    ⚠️ **`≥2` 是選的,不是量出最適值。** 姊妹專案對 54 份筆記模擬的觸發率是
+    現行(任一 poor)1.9–3.7% → `≥2 mixed` **20.4%** → `≥3 mixed` 5.6–11.1%,
+    而 `≥2` 在兩套標籤解析下都是 20.4%(不受複合標籤歧義影響)。
+    **本專案沒有自己的模擬** —— 這個門檻是**借來的**,必須在 Phase 6 用真實 README 實測。
+    若觸發率明顯偏離,先懷疑 R-004(借自信度最低的 L-004),再考慮動門檻。
+  na_boundary: |
+    門檻是**絕對值 2**,不是「非 n/a 維度的過半」。
+    「2 個 n/a + 2 個 mixed」與「4 維全判 + 2 個 mixed」**同罰** ——
+    n/a 表示該維度不適用,不該讓其餘維度變便宜或變貴。
+
+# ════════════════════════════════════════════════════════════════════════
+# E. 措辭紀律
+# ════════════════════════════════════════════════════════════════════════
+wording_discipline: |
+  1. **不得宣稱星數/受歡迎程度的關聯。** 本 rubric 沒有那個資料。
+     可以說「這條的依據是 X」,不可以說「資料顯示這樣做會更受歡迎」。
+  2. **lint 分數不是品質結論。** 它是 hygiene 門檻與安全過濾器,
+     craft verdict 才是主判 —— 這是姊妹專案六個 phase 的結論。
+  3. **形狀先於準則。** 把 library 的標準套到 awesome 清單上是最常見的誤判來源。
+  4. 判 `good` 也要附證據 ——「找不到問題」和「查過而且它做對了」是兩件事。

@@ -1,0 +1,138 @@
+{
+  "_note": "readme-reviewer 的行為契約。fixture 全部進版控,不依賴外部 clone。",
+  "cases": [
+    {
+      "name": "good — 四維俱全的 CLI README",
+      "fixture": "good-readme",
+      "shape": "cli",
+      "expected": {
+        "hygiene": "pass",
+        "expect_block": false,
+        "expect_block_reason": "無 hygiene error。⚠️ blocks() 只看 hygiene,對安全與 craft 不具鑑別力",
+        "craft_dimensions": {
+          "R-001": "good",
+          "R-002": "good",
+          "R-003": "good",
+          "R-004": "good"
+        },
+        "craft_verdict": "approved",
+        "teaching_point": "四維全 good 才走到規則 6。它有定位句、前置條件、預期輸出、why 段、非目標段、與帶日期的限制 —— 每一條都對應一個 pass_criteria",
+        "hygiene_pass": {
+          "H-001": true,
+          "H-002": true,
+          "H-003": true,
+          "H-004": true,
+          "H-005": true
+        }
+      }
+    },
+    {
+      "name": "bad — 根本沒有 README",
+      "fixture": "no-readme",
+      "shape": "library",
+      "expected": {
+        "hygiene": "FAIL(H-001:找不到 README)",
+        "expect_block": true,
+        "expect_block_reason": "H-001 是唯一 error 級門檻,這是 evals 裡唯一該擋的 case",
+        "craft_dimensions": {
+          "R-001": "poor",
+          "R-002": "poor",
+          "R-003": "poor",
+          "R-004": "poor"
+        },
+        "craft_verdict": "needs-revision",
+        "teaching_point": "⚠️ 本案對規則序**不具鑑別力**:規則 1(hygiene)與規則 3(poor)答案相同。門檻的正確性由 lint selftest 的規則 1 case 釘住,不由本案釘住",
+        "hygiene_pass": {
+          "H-001": false,
+          "H-002": false,
+          "H-003": false,
+          "H-004": true,
+          "H-005": true
+        }
+      }
+    },
+    {
+      "name": "shape — awesome 清單,H-003 未過但那是豁免",
+      "fixture": "awesome-list",
+      "shape": "awesome_list",
+      "expected": {
+        "hygiene": "pass(H-003 未過屬形狀豁免)",
+        "expect_block": false,
+        "expect_block_reason": "H-003 是 warning 不是 error;且 awesome 清單型本就無安裝段",
+        "craft_dimensions": {
+          "R-001": "good",
+          "R-002": "n/a",
+          "R-003": "good",
+          "R-004": "mixed"
+        },
+        "craft_verdict": "approved-with-notes",
+        "teaching_point": "**形狀先於準則**:R-002 判 n/a 而非 poor。若照字面套 CLI 的標準,這份會被判 needs-revision —— 那正是姊妹專案 22 個樣本中出現 6 次的誤判型。R-004 判 mixed 是因為有收錄標準但無最後更新時間",
+        "hygiene_pass": {
+          "H-001": true,
+          "H-002": true,
+          "H-003": false,
+          "H-004": true,
+          "H-005": true
+        }
+      }
+    },
+    {
+      "name": "security — curl | sh 作為唯一安裝路徑",
+      "fixture": "security-pipe",
+      "shape": "cli",
+      "expected": {
+        "hygiene": "pass",
+        "expect_block": false,
+        "expect_block_reason": "安全紅旗刻意不擋 gate —— 改成擋屬設計變更",
+        "security": [
+          {
+            "id": "S-001",
+            "flag": "pipe_to_shell",
+            "review": "confirmed",
+            "source": "README 的唯一安裝路徑是 `curl -fsSL … | sh`,無並列的非管道路徑、無「先看腳本」的提示"
+          }
+        ],
+        "craft_dimensions": {
+          "R-001": "poor",
+          "R-002": "mixed",
+          "R-003": "poor",
+          "R-004": "poor"
+        },
+        "craft_verdict": "needs-revision",
+        "teaching_point": "⚠️ S-001 是 **warning** 級,**不會**翻 verdict(rollup 規則 2 只認 error)。這裡判 needs-revision 的是規則 3(R-001/R-003/R-004 皆 poor)—— 一份只有標題與一行安裝的 README。**標示 ≠ 扣分**:curl|sh 本身是慣例,扣的是「沒有並列路徑」",
+        "hygiene_pass": {
+          "H-001": true,
+          "H-002": true,
+          "H-003": true,
+          "H-004": true,
+          "H-005": true
+        }
+      }
+    },
+    {
+      "name": "hygiene — 死連結(相對路徑 + anchor)",
+      "fixture": "dead-links",
+      "shape": "library",
+      "expected": {
+        "hygiene": "pass(H-005 未過為 warning)",
+        "expect_block": false,
+        "expect_block_reason": "H-005 是 warning;死連結不擋 gate,但會進 gap_list",
+        "craft_dimensions": {
+          "R-001": "mixed",
+          "R-002": "mixed",
+          "R-003": "poor",
+          "R-004": "poor"
+        },
+        "craft_verdict": "needs-revision",
+        "teaching_point": "H-005 同時抓到相對路徑(docs/missing.md)與同檔 anchor(#沒有這一節)。**anchor 比對用 GitHub slug 規則且保留 CJK** —— 這是本專案自己的 README 就會用到的",
+        "hygiene_pass": {
+          "H-001": true,
+          "H-002": true,
+          "H-003": true,
+          "H-004": true,
+          "H-005": false
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+name: validate
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate plugin JSON
+        run: |
+          for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json \
+                   readme-reviewer/evals/evals.json; do
+            python3 -c "import json,sys;json.load(open('$f'))" || { echo "❌ $f 非法 JSON"; exit 1; }
+          done
+          echo "✅ 三份 JSON 合法"
+
+      - name: Version consistency (plugin / marketplace)
+        run: |
+          a=$(python3 -c "import json;print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          b=$(python3 -c "import json;print(json.load(open('.claude-plugin/marketplace.json'))['plugins'][0]['version'])")
+          test "$a" = "$b" || { echo "❌ 版本不同步（$a vs $b）"; exit 1; }
+          echo "✅ plugin/marketplace 版本同步：$a"
+
+      - name: rubric_version present and referenced by SKILL.md
+        run: |
+          v=$(grep -m1 '^rubric_version:' readme-reviewer/references/rubric.yaml | tr -d '"' | awk '{print $2}')
+          test -n "$v" || { echo "❌ rubric.yaml 缺 rubric_version"; exit 1; }
+          grep -q "rubric_version: \"$v\"" readme-reviewer/SKILL.md \
+            || { echo "❌ SKILL.md 的 rubric_version 與 rubric.yaml 不同步（rubric=$v）"; exit 1; }
+          echo "✅ rubric_version=$v（兩處同步）"
+
+      - name: Current plugin version has a CHANGELOG section
+        run: |
+          v=$(python3 -c "import json;print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          grep -q "^## \[$v\]" CHANGELOG.md \
+            || { echo "❌ CHANGELOG.md 缺 '## [$v]' 段落——版本動了但沒說動了什麼"; exit 1; }
+          echo "✅ CHANGELOG 有 [$v] 段落"
+
+      - name: SKILL.md frontmatter
+        run: |
+          f=readme-reviewer/SKILL.md
+          head -1 "$f" | grep -q '^---$' || { echo "❌ 缺 frontmatter 起始 ---"; exit 1; }
+          grep -q '^name:' "$f"        || { echo "❌ frontmatter 缺 name:"; exit 1; }
+          grep -q '^description:' "$f" || { echo "❌ frontmatter 缺 description:"; exit 1; }
+          echo "✅ SKILL.md frontmatter 完整"
+
+      - name: References exist
+        run: |
+          for r in rubric.yaml patterns.md; do
+            test -f "readme-reviewer/references/$r" || { echo "❌ 缺 references/$r"; exit 1; }
+          done
+          echo "✅ references 齊全"
+
+      - name: install.sh syntax (POSIX)
+        run: sh -n install.sh && echo "✅ install.sh POSIX syntax 通過"
+
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    name: python ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # 「零依賴」不是自我宣稱，而是在每個支援版本上實測出來的：沒有 pip install 這一步。
+      - name: Selftest (pure functions + drift-guard)
+        run: python readme-reviewer/scripts/lint_readme.py --selftest
+
+      - name: Eval regression (committed fixtures)
+        run: python readme-reviewer/evals/run_evals.py --ci
+
+  windows:
+    runs-on: windows-latest
+    name: windows
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 工具訊息含中文；Windows 重導向時預設走 locale 編碼會 UnicodeEncodeError。
+      # 刻意用 PYTHONUTF8=0 驗證 lint 自己 reconfigure 得起來。
+      - name: Selftest without PYTHONUTF8
+        env:
+          PYTHONUTF8: "0"
+        run: python readme-reviewer/scripts/lint_readme.py --selftest
+
+      - name: Eval regression on Windows
+        run: python readme-reviewer/evals/run_evals.py --ci
