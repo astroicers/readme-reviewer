@@ -39,3 +39,8 @@ Helm 的 template 在**跨環境差異只有兩三個欄位**時,維護成本高
 - 不做 rollback,失敗請自行 `kubectl rollout undo`
 
 詳見 [設計說明](#為什麼不用-helm)。
+
+## 求助與維護
+
+- 問題先看[已知限制](#已知限制),再開 [GitHub Issues](https://example.com/issues)
+- 維護者:platform 團隊(`#platform` 頻道可敲)

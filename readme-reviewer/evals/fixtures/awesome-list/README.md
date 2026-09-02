@@ -10,3 +10,8 @@
 ## 文章
 
 - [Widget 設計取捨](https://example.com/c) — 為什麼多數實作選了錯的抽象層級
+
+## 維護與求助
+
+由 [@curator](https://example.com/curator) 維護。
+**提問去 [Discussions](https://example.com/discussions)**;收錄建議開 issue,**不收商業推廣**。

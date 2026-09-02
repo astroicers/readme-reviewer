@@ -7,7 +7,67 @@
 
 ## [Unreleased]
 
-### 判讀語料:雙抽樣框 12 份真實 README(2026-09-02)
+(空)
+
+---
+
+## [0.2.0] — 2026-09-02(rubric 0.2.0 / 工具 0.2.0)
+
+**第一次誤判批次處理:12 條待處理 → 0。** 8 修 / 2 查證後刻意不修 / 2 記分歧或使用陷阱。
+逐條裁決與重模擬全文:`reviews/2026-09-02-misjudgment-batch-1.md`。
+
+### 判準(rubric 0.1.0 → 0.2.0)
+
+- **R-004 `decision_order` 三出口 → 五出口**:舊結構下「無易腐內容」對真實 README
+  幾乎不可能成立,實際只剩 good/poor 兩個出口(18 份實測 mixed 僅 1 次)。
+  新結構讓 mixed 從兩側可達;**機械同步形式**(指向單一事實源 / repo 內相對路徑 /
+  同步標記+CI)收進 `equivalent_forms`,**外部文件網站明文排除**
+- **新增 R-005 求助與維護**:GitHub Docs 五項的第 4、5 項 + Standard Readme 兩條款
+  獨立佐證(皆逐字查證;實測 12 份有 10 份寫了求問管道——第一版誤記 11,
+  複審 F-07 更正)。**缺席不設 poor**(GitHub 預設有 Issues;poor 只給
+  「寫了但已失效/誤導」);「不提供支援」是合格答案;內部工具 n/a。
+  rollup 門檻維持**絕對值 2**,刻意不隨分母 4→5 調整
+- **H-002 撤銷「H1 等於 repo 名」扣分,severity 降 info**:與自己引用的
+  Standard Readme Title 規則直接矛盾。(⚠️ 本段第一版還引了一條「與 R-001 poor
+  零重疊」的統計——獨立複審重算後**交集是 1、且該統計屬於另一支**,已撤下;
+  更正全文見批次報告 §1)
+- **新增 `craft_value_mapping`**:good/mixed/poor 的取值映射從「判讀者自選」變成條文
+  (首批判讀實測到的信度殺手)
+- **形狀表新增「索引/導覽型」**:R-003 判分類與導覽結構品質,**不歸零**
+- H-004 查證後**刻意不修**(抽查 6/6 未標註 fence 是目錄樹/對話樣張/ASCII 圖,
+  本就無語言可標;info 級不進 verdict),補 known_false_positives
+
+### 工具(0.1.0 → 0.2.0)
+
+- **標題抽取支援 ATX + setext + HTML 三語法,並先遮罩 fence 與 frontmatter**——
+  修掉「一個根因、三個面向」:torvalds/linux(ATX 0/setext 15)曾讓 H-002/H-003/
+  own-anchor 同時出錯;amplication 的 bash 註解曾被當 H1(**它以前因錯誤的理由通過
+  H-002,修後如實轉未過**,logo 型交 LLM 複核)
+- **`github_slug()` 空白逐個換 `-`**(GitHub 不折疊連續空白):`Art & Design` →
+  `art--design`。12 個真實 anchor 誤報全數解析;slug 前先取渲染文字
+  (連結取 text、圖片取 alt、剝 tag)
+- **`broken_links` 認 `<a name=>` / `id=` 具名錨**;fence 內連結不再誤掃
+- **H-005 稀疏 root 警示**:root 無子目錄且檔案極少時,note 明說「相對路徑死鏈
+  可能是單檔抽樣的假陽性」(2026-09-02 實測:16 個命中全部無效的教訓)
+- `HYGIENE_SEVERITY` 提到模組層,drift-guard 逐條與 rubric 對帳(craft 維度鍵也對)
+- evals:五案例補 R-005;**案例宣告 dims 必須五維俱全**(否則新維度從 evals
+  消失不會轉紅);兩個 fixture 補求助/維護段以行使 good 路徑
+- 新增 `scripts/resimulate_18.py`:18 份重模擬的分佈數字由它重算並斷言,掛 CI
+
+### 驗證
+
+- **9 個突變逐個打,9/9 轉紅,復原後全綠**(slug 折疊、setext、HTML 標題、fence 遮罩、
+  frontmatter、具名錨、H-002 severity drift、R-005 鍵 drift、evals 缺維)。
+  ⚠️ 自跑突變只涵蓋自己想得到的形狀
+- 18 份重模擬:needs-revision 11→10(唯一翻正:torvalds/linux,repo 內相對路徑
+  是機械同步);R-005 造成兩個 approved → approved-with-notes(claude-code-warp、
+  ai/size-limit——兩份都無可指認的求助管道)。**重模擬不是校準,判讀者同一人**
+
+---
+
+### 同日稍早的判讀語料與來源查證(本版的觸發來源,PR #1)
+
+#### 雙抽樣框 12 份真實 README
 
 首批 6 份**全是 skill/plugin 相關,形狀偏斜**。本輪按兩個獨立抽樣框各抽 6 份非 Claude 生態的
 README,用**同一套 rubric 0.1.0** 判。全文:`reviews/2026-09-02-two-frame-comparison.md`。
@@ -34,10 +94,9 @@ README,用**同一套 rubric 0.1.0** 判。全文:`reviews/2026-09-02-two-frame-
 - **抽樣陷阱**:只下載 README、未 clone repo ⇒ H-005 的相對路徑那一半(16 個命中)**全部無效**,
   且讓 `linux` 的 R-002 判不了。**一個捷徑,兩處後果。**
 
-### `triangulation_sources` 三個來源已逐條查證(rubric 檔改動,**零判準變更**)
+#### `triangulation_sources` 三個來源逐條查證(該步零判準變更)
 
-`rubric_version` **維持 0.1.0** —— 改的是來源出處與查證狀態,**沒有動任何 hygiene / craft /
-security / rollup 條文**。遞增版本會讓「查證了來源」看起來像「改了判準」。
+該步 `rubric_version` 維持 0.1.0(改的是來源查證狀態;**同日稍後的批次處理才升 0.2.0**)。
 
 | 來源 | 狀態 | 查到的**反證** |
 |---|---|---|
@@ -48,6 +107,7 @@ security / rollup 條文**。遞增版本會讓「查證了來源」看起來像
 
 ⚠️ **查證來源不等於驗證權重。** 三份逐字引用改變的是「我們說某來源講了什麼」的可信度,
 **不改變**「權重是選的、不是量出來的」——證據性質段一字未動。
+
 
 ---
 
