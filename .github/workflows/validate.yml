@@ -101,6 +101,9 @@ jobs:
       - name: Blind-judge agreement numbers match report claims
         run: python scripts/blind_agreement.py
 
+      - name: Round-2 blind-judge numbers and pre-registered outcomes
+        run: python scripts/blind_agreement_r2.py
+
   windows:
     runs-on: windows-latest
     name: windows
