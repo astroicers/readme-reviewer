@@ -7,7 +7,47 @@
 
 ## [Unreleased]
 
-(空)
+### 判讀語料:雙抽樣框 12 份真實 README(2026-09-02)
+
+首批 6 份**全是 skill/plugin 相關,形狀偏斜**。本輪按兩個獨立抽樣框各抽 6 份非 Claude 生態的
+README,用**同一套 rubric 0.1.0** 判。全文:`reviews/2026-09-02-two-frame-comparison.md`。
+
+- **A 框**(`matiassingers/awesome-readme` 人工策展):approved 1 / with-notes 2 / needs-revision 3
+- **B 框**(GitHub 星數排序):approved 0 / with-notes 1 / needs-revision 5
+- ⚠️ **兩框差異更可能是形狀的、不是品質的** —— B 框 3 份清單型、A 框 0 份;n=6 vs 6;
+  判讀者仍是我。**三個限制寫在結論之前。**
+
+**撈到的東西**(全部入 `misjudgments.md`,待處理 6→12,**達批次門檻上緣**):
+
+- ⭐ **R-004 事實上是個二元開關。** `decision_order` 順序 2 對真實 README 幾乎不可能成立,
+  於是只剩 1 與 3;實測 R-004 的 12 個標記是 **good 4 / mixed 1 / poor 7**。
+  **兩批合計 12 個 poor,10 個出自 R-004**,而它是唯一能單獨翻 verdict 的維度。
+- ⭐ **三個程式缺陷,全部有實測與 ground truth**:
+  (a) `HEADING_RE` 只認 ATX —— **setext 與 HTML `<h1>` 全盲**,`torvalds/linux`
+      (ATX 0、setext 15)因此讓 H-002 / H-003 / own-anchor 集合**同時**出錯,一個根因三個面向;
+  (b) `github_slug()` 把連續空白折成單一 `-`,GitHub 是逐個換 —— `Art & Design` 應為
+      `art--design`,本批 12 個 anchor 死鏈**全部**是這個形狀;
+  (c) `broken_links` 不認 HTML 具名錨。⇒ **H-005 本批 8 次開火,0 個確認的真陽性。**
+- **R-001 首次產生 poor**,機制可指認:第一屏被贊助商/自家產品廣告佔滿
+  (`public-apis` 的 H1 是贊助商產品標題;`sindresorhus/awesome` 前 78 行是作者自家 app 廣告)。
+  **判準不是只有 R-004 會說「不」。**
+- **抽樣陷阱**:只下載 README、未 clone repo ⇒ H-005 的相對路徑那一半(16 個命中)**全部無效**,
+  且讓 `linux` 的 R-002 判不了。**一個捷徑,兩處後果。**
+
+### `triangulation_sources` 三個來源已逐條查證(rubric 檔改動,**零判準變更**)
+
+`rubric_version` **維持 0.1.0** —— 改的是來源出處與查證狀態,**沒有動任何 hygiene / craft /
+security / rollup 條文**。遞增版本會讓「查證了來源」看起來像「改了判準」。
+
+| 來源 | 狀態 | 查到的**反證** |
+|---|---|---|
+| GitHub Docs — About READMEs | ✅ | 五項內容中「去哪求助」「誰維護」**本 rubric 零維度承載** |
+| Standard Readme `spec.md` | ✅ | Title 規則**與 H-002 直接矛盾**;本 repo README 違反其 Short Description 三條 |
+| `matiassingers/awesome-readme` | ✅ **新增** | 六條收錄理由**零次**提及 R-004 或前置條件 |
+| Make a README / Diátaxis | ⏳ 未查 | — |
+
+⚠️ **查證來源不等於驗證權重。** 三份逐字引用改變的是「我們說某來源講了什麼」的可信度,
+**不改變**「權重是選的、不是量出來的」——證據性質段一字未動。
 
 ---
 
