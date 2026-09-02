@@ -31,31 +31,14 @@
 
 ## 待處理
 
-**目前 12 條**(第一天自審 2 + 首批 craft 判讀 4 + 雙抽樣框判讀 6),
-**已達 5–10 門檻上緣 ⇒ 下一個動作就是批次處理,不要再累積**。
-
-全文:[`reviews/2026-09-02-first-craft-batch.md`](reviews/2026-09-02-first-craft-batch.md)(6 份)、
-[`reviews/2026-09-02-two-frame-comparison.md`](reviews/2026-09-02-two-frame-comparison.md)(12 份,兩個抽樣框)。
-
-**批次處理時的建議優先序**(依證據強度,非依登記順序):
-1. 三個程式缺陷(setext/HTML 標題、slug 折疊、HTML 具名錨)—— **有實測、有 ground truth、修法明確**
-2. R-004 的二元開關結構 —— 承擔 10/12 的 poor,且**無任何外部支持**
-3. 「去哪求助 / 誰維護」兩個內容面 —— **兩個獨立規範都明文要求,而本 rubric 零維度承載**
+**目前 0 條** —— 12 條已於 2026-09-02 批次處理完畢
+(**8 修 / 2 查證後刻意不修 / 2 記分歧或使用陷阱**),
+全文與逐條裁決見 [`reviews/2026-09-02-misjudgment-batch-1.md`](reviews/2026-09-02-misjudgment-batch-1.md)。
+⇒ rubric **0.2.0** / 工具 **0.2.0**。
 
 | 日期 | 對象 | 規則 | 它說什麼 | 我認為應該是什麼 |
 |------|------|------|----------|------------------|
-| 2026-09-01 | 本 repo | H-002「H1 不只是 repo 名」 | 判 warning:`H1='readme-reviewer' (與 repo 名相同)` | ⚠️ **可能是條文太嚴,不是 README 的問題。** `H1 = 專案名` 是 GitHub 上近乎普遍的慣例(Standard Readme 亦如此規定),定位句放在**緊接的下一行**才是常態。本 repo 的 README 正是這樣寫的:H1 之後第一個 blockquote 就是「這是一個審查 GitHub README 寫得好不好的工具」。⚠️ **修之前先確認**:(a) 條文的意圖是抓「**第一屏沒有定位**」,而不是抓「H1 等於專案名」—— 現在的 `pass_criteria` 把代理當成了目標;(b) 但放寬成「H1 後 N 行內有定位句」會變成語意判斷,**那本來就該是 R-001 的工作,不是 hygiene 的**。可能的正解:**H-002 只報事實不判 pass/fail**(降 info),把定位判斷完全交給 R-001。⚠️ **2026-09-01 Phase 6 實測把 n=1 升級成 n=15**:對 15 個真實 README(自家 2 + skill 語料 5 + 已裝 marketplace 8)跑 lint,**H-002 觸發 8 次 = 53%** —— 命中的包括 `anthropics/skills`、`claude-code-warp`、`superpowers-marketplace`。**一個對半數優良 README 開火的 warning 不是訊號,是噪音。**⇒ 傾向的修法仍是「降 info、只報事實,定位判斷交給 R-001」,但**條文仍不動** —— 依紀律等批次處理,且要先確認 R-001 真的接得住 |
-| 2026-09-01 | 15 個真實 README | H-004「≥70% code fence 標語言」 | 觸發 6/15 = **40%** | ⚠️ **偏高,但成因可能不是門檻。** 真實 README 常有**本來就不該標語言**的 fence:終端機輸出、目錄樹、純文字示意。若是這樣,正解是**排除輸出型 fence** 而不是調門檻——但那需要分辨「這個 fence 是程式碼還是輸出」,而 **fence 內容本身分不出來**。⚠️ 修之前先確認:(a) 那 6 個命中裡有幾個是輸出型;(b) 門檻是 `info` 級,**它本來就不進 verdict** —— 噪音成本比 H-002 低很多 |
-| 2026-09-02 | 6 份真實 README | R-004 的 `decision_order` | **3 個 poor 全部出自 R-004,沒有一個來自其他三維** | ⚠️ **順序 3 太容易走到。**「有易腐內容」對任何 listing/collection 型 README 幾乎恆真(套件數、skill 數、支援清單、版本號),於是只要沒寫「已知限制」段就**直達 poor**,而 poor 是 rollup 規則 3、單獨就翻 verdict。`superpowers-marketplace` 與 `Jeffallan/claude-skills` 都是這樣被判掉的,**兩份都是堪用甚至相當好的 listing README**。⚠️ 條文自己就預告過這件事(「本條若過度觸發,先懷疑它,不要先調 rollup 門檻」)—— 第一批就撞上了。可能修法:順序 1 加認「機械同步/自動生成」與「明確的維護訊號」;或把順序 3 由 poor 降 mixed。⚠️ **2026-09-02 雙抽樣框判讀把機制講得更精確,不只是「順序 3 太容易走到」**:順序 2(無限制陳述**且**無易腐內容)對任何真實 README 幾乎不可能成立,於是實際只剩 1 與 3;再與「基礎達成=good」的讀法交互,**R-004 事實上是個二元開關**——`mixed` 只在「有限制陳述、但易腐內容已實際腐壞」的窄縫裡出現(12 份裡唯一一個:`choojs/choo`,Travis CI badge 與 freenode 連結都已名存實亡)。實測 R-004 的 12 個標記:**good 4 / mixed 1 / poor 7**。**兩批合計 12 個 poor,10 個出自 R-004**,而它只是四維之一,且是唯一能單獨翻 verdict 的那個。⚠️ 另:**R-004 目前沒有任何外部支持** —— 已查證的 `matiassingers/awesome-readme` 六條收錄理由零次提及限制誠實或前置條件(但那個策展標準本身偏打包面,**兩種讀法資料分不開**,見報告) |
-| 2026-09-02 | `Jeffallan/claude-skills` | R-004 判 poor | 它的易腐數字寫成 `<!-- SKILL_COUNT -->67<!-- /SKILL_COUNT -->` | **機械同步的標記**,而姊妹專案實測過該 repo 有 CI 驗證 count consistency —— **那其實是一種「驗證方式」**,正是 R-004 高分要件認可的形式。但 `decision_order` 順序 1 只認「限制/非目標/適用邊界**陳述**」,**看不到機械同步這種形式** ⇒ 條文把一個真的好做法判成 poor。⚠️ 與上一列同根,但**證據不同**(這一列有具體的機械形式,上一列是統計面),分開記。⚠️ **2026-09-02:n 由 1 升到 3,且三個實例的機械形式各不相同** —— (b) `amplication`:「check `engines` `node` in the [package.json](./package.json)」,把易腐數字**指向單一事實源**而不在 README 複製一份;(c) `torvalds/linux`:全篇易腐內容幾乎都是 **repo 內相對路徑**(30+ 條 `Documentation/**`),隨 repo 一起版控、天然同步,GitHub 還會直接顯示斷連結。**三個都被判 poor。** 這不是同一招的重複,是同一族做法的三種形式全部漏接 |
-| 2026-09-02 | 本 repo(條文結構) | 四維的 `pass_criteria` | 都寫成「基礎:… 高分:…」 | **但沒有把它映射到 good/mixed/poor 取值域。** 判讀時我採用「基礎達成=good、基礎部分達成或有可指認瑕疵=mixed、基礎未達成=poor」—— **那是我選的,條文沒說**。另一個判讀者可以合理地選別的(例如「高分未達成=mixed」),結果會完全不同。⚠️ 這是**信度問題不是效度問題**:它不會讓判準判錯,會讓兩個人判不一樣。姊妹專案的 κ 量測就是死在這種地方 |
-| 2026-09-02 | 形狀表 | 缺「索引/導覽型」一列 | `anthropics/skills` 與 `Jeffallan/claude-skills` 的 README 本體是**指向別處的目錄** | 不是教學也不是清單:R-003 的「規則附因果理由」對它們幾乎不適用 —— **它們沒有規則要解釋**。現行只能勉強套 collection 或 awesome。⚠️ 修之前先確認:加一列會不會讓 R-003 對這類 repo 變成永遠 n/a,那等於少一個維度 |
-| 2026-09-02 | `torvalds/linux`、`choojs/choo` | `HEADING_RE` 只認 ATX 標題 | **一個根因、三個面向的假陽性。** `HEADING_RE = ^(#{1,6})\s+…` 看不見 **setext 標題**(`===`/`---` 底線)與 **HTML `<h1>`**。實測 `torvalds/linux`:**ATX 0 個、setext 15 個** ⇒ lint 認為它一個標題都沒有,於是 (a) H-002 報「無文字 H1」——它有(`Linux kernel`);(b) H-003 報無安裝段——它有 `Quick Start` 且含 build 指引;(c) `broken_links` 的 own-anchor 集合為空 ⇒ 任何同檔 anchor 都會被報死鏈。`choojs/choo` 是另一種形式:`<h1 align="center">Choo</h1>` 有文字卻不被認。⚠️ **這與 `known_false_positives` 記的「logo 圖片取代 H1」不是同一件事** —— 那一條是「真的沒有文字標題」,這一條是「有,但語法沒被涵蓋」。修法明確(補 setext + HTML 兩種形式),但**要一次修這一類、不要只修報出來的那一支** |
-| 2026-09-02 | `public-apis`、`awesome-python`、`choo` | `github_slug()` 折疊連續空白 | `re.sub(r"\s+", "-", …)` 把連續空白折成**單一** `-`,而 **GitHub 是逐個空白換一個 `-`**。含被移除標點的標題因此算錯:`Art & Design` → GitHub `art--design`、我們 `art-design`。本批 anchor 死鏈 **12 個命中,12 個都是這個形狀**。⚠️ **ground truth 不是我推的**:那些 `#art--design` 連結是三個獨立長期維護的高星 repo 寫的,而 GitHub Docs 明說 anchor 可從渲染後的標題直接複製("Hovering over a heading reveals a link icon… to display the anchor")⇒ 作者是從 GitHub UI 抄的 |
-| 2026-09-02 | `amplication/amplication` | `broken_links` 不認 HTML 具名錨 | `#contributing_anchor` 對應 `<a name="contributing_anchor"></a>`,GitHub 認、我們不認 ⇒ 假陽性。⚠️ 與上一列合計:**H-005 在本批 8 次開火,`0` 個確認的真陽性** |
-| 2026-09-02 | 本輪抽樣方法 | H-005 需要**完整 repo**,不是一個 README 檔 | **這是使用陷阱不是工具缺陷,但它造成了兩處實際錯誤。** 我只下載 README、沒 clone repo ⇒ 16 個相對路徑命中**全部無效**;而且 `torvalds/linux` 的形狀(路由型)要求「以子文件抽樣評分」,**同一個捷徑讓那也做不到**,R-002 只能判 `n/a`。⇒ README 與 SKILL.md 都沒說 H-005 有這個前提,**要補**。⚠️ 順帶:同一個抽樣目錄命名(`ai_size-limit` 而非 `size-limit`)讓 H-002 的「H1 等於 repo 名」那一支**本批零次觸發** —— 所以 **7/12 的 H-002 未過不能拿來強化第 1 列**,那一列講的是另一支 |
-| 2026-09-02 | 判準涵蓋面 | GitHub Docs 五項中**兩項無維度承載** | GitHub Docs「About READMEs」明列五項,本 rubric 只承載三項:**「Where users can get help」與「Who maintains and contributes」完全沒有維度在判**。⚠️ **Standard Readme 獨立佐證同兩項**(Contributing 要求 "State where users can ask questions";Maintainers 要求 "along with one way of contacting them")。⚠️ 而實測 12 份裡 **11 份寫了求助管道**(唯一沒寫的是 `sindresorhus/awesome`)—— **判準對此完全看不見**。**兩個獨立來源都明文要求、而我們零維度**,是目前證據最強的一條缺口。⚠️ 修之前先確認:加維度會改變 rollup 的分母(4→5),`≥2 mixed` 門檻的觸發率會跟著變,**兩件事要一起算** |
-| 2026-09-02 | 本 repo 的 README | 違反 Standard Readme 的 Short Description 規則 | spec 明文 "Must not have its own title" / "Must be less than 120 characters" / **"Must not start with `> `"** —— 而本 repo 的定位句就在 blockquote 裡。⚠️ **這是分歧不是錯誤**:那是該 spec 的規定,不是普世真理(GitHub Docs 沒這條),而 blockquote 的視覺效果正是我要的。**但既然引用它當 triangulation 來源,分歧就要註明** —— 引用一份規範卻靜默違反它,就是證據說謊的一種 |
+|（空）| | | | |
 
 ## 待測(儀器目前做不到,**不佔處理額度**)
 
@@ -70,6 +53,7 @@
 
 | 日期 | 對象 | 規則 | 處置 |
 |------|------|------|------|
+| 2026-09-02 | **批次 #1(12 條)** | 見 [`reviews/2026-09-02-misjudgment-batch-1.md`](reviews/2026-09-02-misjudgment-batch-1.md) | **8 修 / 2 刻意不修 / 2 記分歧**,rubric 0.1.0→0.2.0、工具 0.1.0→0.2.0。修:H-002 撤 bare-name 扣分降 info;R-004 三出口→五出口(+機械同步 equivalent_forms);craft_value_mapping;形狀表+索引/導覽型;HEADING_RE 三語法+fence 遮罩;slug 逐空白;HTML 具名錨;H-005 前提文件化+稀疏 root 警示;**R-005 新增**(缺席不設 poor;內部工具 n/a)。刻意不修:H-004(抽查 6/6 輸出型,info 級);rollup `≥2 mixed` 門檻(重模擬無調整依據)。分歧:本 repo README 的 blockquote 定位句與 Standard Readme 相左,已於 README 註明。18 份重模擬:needs-revision 11→10、R-004 poor 10→7,數字由 `scripts/resimulate_18.py` 斷言並掛 CI。9/9 突變轉紅 |
 | 2026-09-02 | 本 repo(流程) | commit 訊息宣稱了沒發生的事 | **已公開更正。** `08e9e01` 的訊息寫「README 的信任度表與 CHANGELOG 同步更新」,而 **README 一個字都沒動** —— 批次改檔的腳本在 README 那一段 `assert` 失敗、整段中止,但我**沒有檢查 `git show --stat` 就 commit 並 push**。成因是 anchor 用半形逗號而檔案是全形。⚠️ **這是本 repo 到目前為止最嚴重的一次**:前面幾條是程式與註解不符,這一條是**commit 訊息與 diff 不符,而且已經推出去了**。⇒ 教訓:**批次改多檔的腳本失敗時會靜默留下半套**,commit 前一律看 `--stat` 對照訊息宣稱的檔案清單 |
 | 2026-09-02 | 本 repo(可攜性) | `subprocess text=True` 吃 locale 編碼 | **已修,這是第三次紅燈、同一根因的第三種面貌。** 前兩次修的是**寫者側**(stdout encode);這次是**讀者側** —— `subprocess.run(text=True)` 在 Windows 用 cp1252 解子行程的 UTF-8 stdout → `UnicodeDecodeError` → `r.stdout` 變 None → `json.loads(None)` TypeError。⇒ 不再逐個修,改為**列出整個編碼邊界**(encode / decode / open)並加守衛。⚠️ 守衛自己連踩三個自我指涉:偵測器字面命中自己、逐行標記漏了訊息字串、**連 sentinel 的偵測行都含 sentinel**。**靜態掃自己是條爛路** ⇒ 改為不掃自己那一支,因為它有更強的驗證(CI 在 `PYTHONUTF8=0` 下直接執行它)。五種突變全數轉紅 |
 | 2026-09-02 | 本 repo(可攜性) | reconfigure 只補了報紅的那一支 | **已修,但這是第二次紅燈。** 第一次修完 CI 再紅一次,失敗步驟換成 `Eval regression` —— `run_evals.py` 同樣印中文、同樣沒有 reconfigure,而我**只修了報紅的那一支、也只重現了那一支**。⇒ 改為對全 repo 的 Python 進入點做系統性檢查,並加一條 selftest 守衛。⚠️ 守衛第一版寫 `"reconfigure" not in _src` —— **註解裡就有那個字**,於是它被自己的說明文字餵飽、突變不轉紅。已改為比對**呼叫**且要求帶 `encoding=` 參數。三種突變(換 pass / 刪整段 / 沒 encoding)全數轉紅。⚠️ **教訓:修的是那一支,還是那一類?** 以及**守衛不要用字面字串比對它自己會提到的詞** |

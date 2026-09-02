@@ -1,5 +1,5 @@
 # rubric.yaml — readme-reviewer 的唯一 canonical 判準
-rubric_version: "0.1.0"
+rubric_version: "0.2.0"
 # 版本語意:major=規則增刪 / minor=權重或標註變更 / patch=文字修訂。
 # lint_readme.py 硬編的值與本檔的一致性由其 --selftest 的 drift-guard 逐項斷言。
 
@@ -111,12 +111,14 @@ hygiene:
     dimension: structure
     check_type: script
     source: triangulation
-    rule: "有 H1 標題,且標題不只是 repo 名字本身"
-    pass_criteria: "存在 `# ` 開頭的一行;若標題去除標點後等於 repo 目錄名,記 warning 不記 pass"
-    severity: warning
-    mechanism: "標題是第一屏的第一個字;只寫 repo 名等於沒說"
+    rule: "有文字 H1 標題(ATX / setext / HTML 皆認)"
+    pass_criteria: "存在有文字的 H1;「H1 等於 repo 名」只回報事實,不影響 pass"
+    severity: info
+    mechanism: "文字標題是渲染錨點與可及性的基礎;定位好壞由 R-001 判,本條只報結構事實"
+    # 2026-09-02 批次修:撤銷「H1 等於 repo 名」的扣分(與本 rubric 引用的
+    # Standard Readme Title 規則直接矛盾),severity 降 info。理由與實測見批次報告。
     known_false_positives: |
-      有些 repo 刻意用 logo 圖片取代 H1(常見於品牌型專案)。
+      有些 repo 刻意用 logo 圖片取代 H1(常見於品牌型專案;12 份實測中 5 份)。
       偵測看不出「圖片承載了標題功能」——**這一條交給步驟 4 的 LLM 複核**,
       lint 只負責指出「沒有文字 H1」這個事實。
 
@@ -144,6 +146,10 @@ hygiene:
       ⚠️ **70% 是選的,不是量出最適值。** 選它的理由:允許少量純輸出/純文字區塊
       (那些本來就不該標語言),但不允許整份都不標。
       **若實測誤判偏多,先懷疑這個門檻。**
+    known_false_positives: |
+      目錄樹、對話樣張、ASCII 示意圖本就無語言可標(```text 可標但非慣例)——
+      未標註 fence 屬此類時不是缺陷。2026-09-02 批次查證後裁決門檻與 severity
+      皆不動(info 級不進 verdict),抽查數字見批次報告。
 
   - id: H-005
     dimension: rendering
@@ -155,13 +161,28 @@ hygiene:
     mechanism: "死連結是讀者最快失去信任的地方,而且是確定性可測的"
     detection_note: |
       只驗**相對路徑**與 **同檔 anchor**;外部 http 連結**不驗**(需要網路,且會偽陰性)。
-      anchor 比對用 GitHub 的 slug 規則(小寫、去標點、空白轉 `-`),
-      **中日韓字元保留** —— 本專案自己的 README 就是中文標題。
+      anchor 比對用 GitHub 的 slug 規則(小寫、去標點、**空白逐個轉 `-`**——
+      連續空白不折疊,`Art & Design` → `art--design`),**中日韓字元保留**;
+      標題認 ATX / setext / HTML 三種語法,`<a name=>` 與 `id=` 也是合法目標。
+    precondition: |
+      ⚠️ **需要完整的 repo,不是一個 README 檔。** 只餵單檔時所有相對路徑
+      當然指不到東西 —— 那是抽樣假陽性不是死鏈(2026-09-02 實測:16 個命中全部無效)。
+      lint 在 root 無子目錄且檔案極少時會在 note 裡明說。
 
 # ════════════════════════════════════════════════════════════════════════
 # B. craft_llm —— **主判**(lint 做不到,也不該假裝做得到)
 # ════════════════════════════════════════════════════════════════════════
 # 取值:good / mixed / poor / n/a。`n/a` 只在形狀表明文豁免時使用。
+# R-001~R-003 共用的取值映射 —— 判讀者**不得自選讀法**。
+# 2026-09-02 批次補:首批判讀發現條文只寫「基礎/高分」而沒映射到取值域,
+# 判讀者被迫自選 —— 那是信度殺手(兩個人判不一樣),姊妹專案的 κ 量測就死在這裡。
+craft_value_mapping: |
+  good  = 基礎達成(高分要件只影響敘述強度,**不影響取值**)
+  mixed = 基礎部分達成,或達成但有可指認的瑕疵
+  poor  = 基礎未達成
+  n/a   = 該維度對此形狀不適用(查 SKILL.md 形狀表與各條 exemption)
+  例外:R-004 與 R-005 有自己的 decision_order,以該序為準。
+
 craft_llm:
   - id: R-001
     dimension: first_screen
@@ -232,10 +253,22 @@ craft_llm:
       高分:易腐內容(版本號、第三方 API、定價、效能數字)帶**時效標記或驗證方式**。
     decision_order: |
       照序判,第一個成立者為準:
-        1. 有明確的限制/非目標/適用邊界陳述 → 至少 mixed,視具體程度上調
-        2. 無上述,但也**沒有易腐內容**(純概念說明、無版本無數字)→ `n/a`
-        3. 無上述,而**有易腐內容**(版本號/API/定價/效能宣稱)→ `poor`
-      ⚠️ 順序 2 與 3 的差別是「**有沒有東西會過期**」,不是篇幅。
+        1. 有限制/非目標/適用邊界/維護狀態陳述,**且**易腐內容帶時效標記
+           或驗證方式(含下方機械同步形式)→ `good`
+        2. 有上述陳述,但易腐內容裸露、**或已實際腐壞**(死 badge、
+           指向已消失的服務)→ `mixed`
+        3. 無上述陳述,但易腐內容有**機械同步形式**(見 equivalent_forms)→ `mixed`
+        4. 無上述,也**沒有易腐內容**(純概念說明、無版本無數字)→ `n/a`
+        5. 無上述,而易腐內容**裸露**(版本號/API/定價/效能宣稱直接寫死)→ `poor`
+      ⚠️ 順序 4 與 5 的差別是「**有沒有東西會過期**」,不是篇幅。
+    equivalent_forms: |
+      「機械同步形式」—— 易腐內容交給機器維護,等價於驗證方式:
+      - **指向單一事實源而不複製**(如「check `engines` in package.json」)
+      - **repo 內相對路徑**(隨版控天然同步,斷了 GitHub 直接顯示)
+      - **自動生成/機械同步標記**且有 CI 驗證痕跡(如 `<!-- COUNT -->` 對標)
+      ⚠️ **指向外部文件網站不算** —— 外部 docs 一樣會腐,只是腐在別處。
+    # decision_order 於 2026-09-02 批次改寫;理由與實測數字**刻意不寫在這裡**
+    # (理由段會污染下一輪判讀),見 CHANGELOG 0.2.0 與批次處理報告。
     anti_patterns:
       - "效能/準確率數字無來源、無日期、無重現方式"
       - "宣稱支援 N 種平台/工具,而沒有任何一種有實測痕跡"
@@ -247,6 +280,47 @@ craft_llm:
       本條的形狀直接借自 skill-quality-research 的 L-004(anti-hallucination),
       那一條是該專案跨兩輪一致性量測中**信度最低**的維度(κ=0.400)。
       ⚠️ **本條若過度觸發,先懷疑它,不要先調 rollup 門檻。**
+
+  - id: R-005
+    dimension: support_and_maintenance
+    check_type: llm
+    source: triangulation
+    rule: "讀者卡住時知道去哪求助;知道這個專案由誰、以什麼狀態維護"
+    pass_criteria: |
+      基礎:求助管道**或**維護主體其一可明確指認。
+      高分:兩者皆有,且求助管道有分流(先看 FAQ / 怎麼報 bug / 去哪問問題)。
+    decision_order: |
+      照序判,第一個成立者為準:
+        1. 有管道/維護資訊但**已失效或誤導**(死的聊天室連結、宣稱活躍實已
+           archived)→ `poor` —— 錯的資訊比沒有更糟
+        2. 求助管道與維護主體**皆**可指認 → `good`
+        3. 僅其一可指認 → `mixed`
+        4. 兩者皆不可指認 → `mixed`
+      ⚠️ 缺席**刻意不設 poor**:GitHub 預設就有 Issues 頁籤,README 沒寫是弱點
+      不是失格。poor 只保留給「寫了但是錯的」。
+    disambiguation: |
+      判準是「**讀者知不知道自己的處境**」,不是「有沒有 Discord」:
+      - 「本專案不提供支援 / 不收 PR」是**合格答案**(維護狀態陳述)→ 計入順序 2/3
+      - 維護主體可從 README 內文指認即可(具名作者、組織名、基金會);
+        **只有 repo URL 裡的帳號名不算內文指認**
+    exemption: |
+      **內部工具 / 個人筆記型**(讀者與維護者同一圈子,求助路徑是走過去問)
+      → `n/a`。形狀判定見 SKILL.md 步驟 3。
+    anti_patterns:
+      - "聊天室/論壇連結已死(freenode 型鏈腐)而 README 未更新"
+      - "求助管道只在贊助商區塊裡,分不清是社群的還是廠商的"
+      - "宣稱歡迎貢獻,但 CONTRIBUTING 連結指不到東西"
+    mechanism: |
+      GitHub Docs 五項內容的第 4、5 項(Where users can get help /
+      Who maintains and contributes),Standard Readme 的 Contributing
+      ("State where users can ask questions")與 Maintainers 條款獨立佐證
+      (兩者皆 2026-09-02 逐字查證)。README 是讀者判斷「這個專案背後有沒有人」
+      的唯一入口 —— 答不出來的專案,讀者會假設最壞情況。
+    evidence_note: |
+      2026-09-02 批次新增。依據是兩個獨立規範的明文條款(見 mechanism),
+      **不是**星數梯度 —— 本 rubric 沒有那種資料。新增理由與 rollup 分母
+      影響的實測見批次報告;⚠️ 本條沒有跨批次的觸發率紀錄,首兩批的
+      重模擬不算(判讀者同一人)。
 
 # ════════════════════════════════════════════════════════════════════════
 # C. security(門檻,不加分。標示 ≠ 禁止)
@@ -333,6 +407,10 @@ craft_verdict_rollup:
     而 `≥2` 在兩套標籤解析下都是 20.4%(不受複合標籤歧義影響)。
     **本專案沒有自己的模擬** —— 這個門檻是**借來的**,必須在 Phase 6 用真實 README 實測。
     若觸發率明顯偏離,先懷疑 R-004(借自信度最低的 L-004),再考慮動門檻。
+  denominator_note: |
+    2026-09-02 起 craft 維度為五(R-001~R-005)。門檻維持**絕對值 2**,
+    刻意不隨分母調整 —— 調整理由若成立,應改門檻常數本身並留紀錄,
+    而不是讓它隨維度數靜默漂移。加維前後的 verdict 重模擬見批次報告。
   na_boundary: |
     門檻是**絕對值 2**,不是「非 n/a 維度的過半」。
     「2 個 n/a + 2 個 mixed」與「4 維全判 + 2 個 mixed」**同罰** ——

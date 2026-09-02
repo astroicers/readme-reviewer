@@ -1,9 +1,9 @@
 ---
 name: readme-reviewer
-description: 審查任意 GitHub repo 的 **README 寫得好不好**,輸出形狀感知的診斷。Use when 使用者要求 review README、審查專案說明文件、評估 GitHub repo 的 README 品質、問「我的 README 寫得如何/缺什麼」、或要為新專案寫 README 前想知道判準。**主判是 craft 質化判讀(R-001~004:第一屏定位 / 最短可執行路徑 / 寫作品質 / 限制誠實),lint 只是先跑的 hygiene 與安全過濾器,其分數不是品質結論。** 輸出三段式:craft verdict + 形狀與缺口 + 分維度 findings。
+description: 審查任意 GitHub repo 的 **README 寫得好不好**,輸出形狀感知的診斷。Use when 使用者要求 review README、審查專案說明文件、評估 GitHub repo 的 README 品質、問「我的 README 寫得如何/缺什麼」、或要為新專案寫 README 前想知道判準。**主判是 craft 質化判讀(R-001~005:第一屏定位 / 最短可執行路徑 / 寫作品質 / 限制誠實 / 求助與維護),lint 只是先跑的 hygiene 與安全過濾器,其分數不是品質結論。** 輸出三段式:craft verdict + 形狀與缺口 + 分維度 findings。
 license: MIT
 metadata:
-  rubric_version: "0.1.0"
+  rubric_version: "0.2.0"
   evidence: "triangulation(公開規範 + 質化樣態),**非**星數梯度——見 references/rubric.yaml 的證據性質段"
 ---
 
@@ -38,6 +38,9 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
 
 讀它的輸出：hygiene 五條門檻、security 紅旗（含 `confidence`）、`craft_llm_todo`。
 
+⚠️ **目標必須是完整的 repo，不能只餵一個 README 檔** —— H-005 驗相對連結，
+單檔時全部指不到東西，那是抽樣假陽性；monorepo/路由型的子文件抽樣也需要整個 repo。
+
 > **例外：呼叫端已經跑過 lint 時，不要重跑。** 直接消費那份輸出——
 > 重跑可能在不同 cwd 下對相對連結得到不同結果，兩份混用會讓判定漂移。
 
@@ -49,6 +52,7 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
 「**這個 repo 根本不用 README 說話**」（例如純資料集鏡像）。不走到形狀判定就分不出來。
 
 其餘四條（H-002~005）是 warning/info，**不單獨決定 verdict**，作為 R-001/R-002 的證據輸入。
+（H-002 只報結構事實；「H1 等於 repo 名」是 Standard Readme 明文要求的形狀，**不是缺陷**。）
 
 ### 步驟 3：先判 README 的形狀（**套準則前必做**）
 
@@ -63,6 +67,7 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
 | **研究 / 論文 / 資料集** | 產出是知識不是可執行物 | **R-002 判 N/A**；R-004 改承載可複現性與資料出處 |
 | **awesome / 清單** | 本體是連結集 | **R-002 判 N/A**；由 R-001（收錄範圍）與 R-003（分類與描述品質）主導 |
 | **monorepo** | 根 README 只做路由 | 不因根 README 薄扣分；**以子套件 README 抽樣**評分 |
+| **索引/導覽型** | 本體是**指向他處的目錄**（文件路由、讀者分流） | R-002 認「**怎麼開始讀/從哪進入**」；R-003 判**分類與導覽結構**品質（不要求規則因果）；R-004 照常（repo 內相對指向計入機械同步） |
 | **模板 / starter** | 給人 fork 當起點 | R-002 認「**怎麼用這個模板**」而非「怎麼安裝」 |
 
 **關鍵**：rubric 條款裡本來就有這些例外（`exemption`、`equivalent_forms`、
@@ -71,14 +76,19 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
 
 ### 步驟 4：質化審 craft（**這是你的核心工作，lint 做不到**）
 
-依 `references/rubric.yaml` 的 `craft_llm` 組逐維度判 `good` / `mixed` / `poor` / `n/a`：
+依 `references/rubric.yaml` 的 `craft_llm` 組逐維度判 `good` / `mixed` / `poor` / `n/a`
+（取值映射見該檔 `craft_value_mapping`，**不得自選讀法**）：
 
 - **R-001 第一屏**：遮住第 15 行之後，讀者知不知道「這是什麼、我是不是目標讀者」？
   badge 不是罪——判準是**它們有沒有把定位擠掉**。
 - **R-002 最短可執行路徑**：指令可貼嗎？**前置條件說了嗎**？成功長什麼樣？
 - **R-003 寫作品質**：關鍵選擇附理由嗎？有具體例子/輸出樣張，還是只有形容詞？
 - **R-004 限制誠實**：說了什麼時候**不該**用嗎？易腐內容（版本、API、定價、效能數字）有時效標記嗎？
-  ⚠️ 照 `decision_order` 走——**「沒有限制陳述」與「沒有東西會過期」是兩回事**。
+  ⚠️ 照 `decision_order` 走——**「沒有限制陳述」與「沒有東西會過期」是兩回事**；
+  「指向單一事實源 / repo 內相對路徑 / 機械同步標記」是**等價的驗證形式**，不是缺席。
+- **R-005 求助與維護**：讀者卡住時知道去哪求助嗎？知道由誰、以什麼狀態維護嗎？
+  ⚠️ 照 `decision_order` 走——**缺席最多 mixed，poor 只給「寫了但已失效/誤導」**；
+  「本專案不提供支援」是合格答案；內部工具判 `n/a`。
 
 **每一個維度都要有值，不得略過。** 判 `good` 也要附證據——
 「找不到問題」和「查過而且它做對了」是兩件事。
@@ -136,7 +146,7 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
 - 每一項註明是**真缺口**還是**偵測形狀的假陰性**——不要照抄 lint
 
 ## 3. 分維度 findings
-（R-001~004 各自的證據與建議；security 複核結論）
+（R-001~005 各自的證據與建議；security 複核結論）
 ```
 
 **措辭紀律**：
@@ -150,11 +160,12 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
 readme_verdict:
   craft: approved-with-notes      # 取值域僅 approved / approved-with-notes / needs-revision
   shape: cli                      # 步驟 3 的形狀
-  dimensions:                     # 四維各一，值為 good/mixed/poor/n/a
+  dimensions:                     # 五維各一，值為 good/mixed/poor/n/a
     R-001: good
     R-002: mixed
     R-003: good
     R-004: n/a
+    R-005: good
   gap_list:
     - "R-002: 安裝指令未說明需要 Python 3.11+，讀者會在第一步失敗"
 ```

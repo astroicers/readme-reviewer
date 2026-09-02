@@ -159,10 +159,17 @@ def c_security_matches_lint():
 def c_rollup_matches_evals():
     """evals 標的 craft_verdict 必須等於 rollup 純函式算出來的。"""
     n = 0
+    L = _lint_module()
     for c in spec()["cases"]:
         e = c["expected"]
         if not e.get("craft_dimensions"):
             continue
+        # SKILL.md:「每一個維度都要有值,不得略過」。rollup 接受子集是給程式彈性,
+        # 案例檔沒有這個彈性 —— 少一維的案例會讓「新維度從 evals 消失」靜默通過。
+        declared = set(e["craft_dimensions"])
+        assert declared == set(L.CRAFT_DIMS), \
+            (f"{c['fixture']}: craft_dimensions 必須五維俱全,"
+             f"缺 {sorted(set(L.CRAFT_DIMS) - declared)} 多 {sorted(declared - set(L.CRAFT_DIMS))}")
         got = case_verdict(e, c["fixture"])
         assert got == e["craft_verdict"], \
             f"{c['fixture']}: rollup 算出 {got} 但 evals 標 {e['craft_verdict']}"

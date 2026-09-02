@@ -78,6 +78,10 @@ jobs:
       - name: Eval regression (committed fixtures)
         run: python readme-reviewer/evals/run_evals.py --ci
 
+      # 批次處理報告引用的 18 份重模擬數字由這支重算並斷言 —— 散文裡的數字無法轉紅
+      - name: Re-simulation numbers match report claims
+        run: python scripts/resimulate_18.py
+
   windows:
     runs-on: windows-latest
     name: windows

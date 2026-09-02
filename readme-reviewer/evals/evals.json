@@ -13,7 +13,8 @@
           "R-001": "good",
           "R-002": "good",
           "R-003": "good",
-          "R-004": "good"
+          "R-004": "good",
+          "R-005": "good"
         },
         "craft_verdict": "approved",
         "teaching_point": "四維全 good 才走到規則 6。它有定位句、前置條件、預期輸出、why 段、非目標段、與帶日期的限制 —— 每一條都對應一個 pass_criteria",
@@ -38,7 +39,8 @@
           "R-001": "poor",
           "R-002": "poor",
           "R-003": "poor",
-          "R-004": "poor"
+          "R-004": "poor",
+          "R-005": "poor"
         },
         "craft_verdict": "needs-revision",
         "teaching_point": "⚠️ 本案對規則序**不具鑑別力**:規則 1(hygiene)與規則 3(poor)答案相同。門檻的正確性由 lint selftest 的規則 1 case 釘住,不由本案釘住",
@@ -63,7 +65,8 @@
           "R-001": "good",
           "R-002": "n/a",
           "R-003": "good",
-          "R-004": "mixed"
+          "R-004": "mixed",
+          "R-005": "good"
         },
         "craft_verdict": "approved-with-notes",
         "teaching_point": "**形狀先於準則**:R-002 判 n/a 而非 poor。若照字面套 CLI 的標準,這份會被判 needs-revision —— 那正是姊妹專案 22 個樣本中出現 6 次的誤判型。R-004 判 mixed 是因為有收錄標準但無最後更新時間",
@@ -96,7 +99,8 @@
           "R-001": "poor",
           "R-002": "mixed",
           "R-003": "poor",
-          "R-004": "poor"
+          "R-004": "poor",
+          "R-005": "mixed"
         },
         "craft_verdict": "needs-revision",
         "teaching_point": "⚠️ S-001 是 **warning** 級,**不會**翻 verdict(rollup 規則 2 只認 error)。這裡判 needs-revision 的是規則 3(R-001/R-003/R-004 皆 poor)—— 一份只有標題與一行安裝的 README。**標示 ≠ 扣分**:curl|sh 本身是慣例,扣的是「沒有並列路徑」",
@@ -121,7 +125,8 @@
           "R-001": "mixed",
           "R-002": "mixed",
           "R-003": "poor",
-          "R-004": "poor"
+          "R-004": "poor",
+          "R-005": "mixed"
         },
         "craft_verdict": "needs-revision",
         "teaching_point": "H-005 同時抓到相對路徑(docs/missing.md)與同檔 anchor(#沒有這一節)。**anchor 比對用 GitHub slug 規則且保留 CJK** —— 這是本專案自己的 README 就會用到的",
