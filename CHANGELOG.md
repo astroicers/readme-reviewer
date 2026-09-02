@@ -61,6 +61,21 @@
 ⇒ 已補上 stdout/stderr 的 `reconfigure(encoding="utf-8")`。
 本機用 `PYTHONIOENCODING=cp1252` 重現:**修前 rc=1、修後 rc=0**。
 
+### ⚠️ 更正:`08e9e01` 的 commit 訊息宣稱了沒發生的事
+
+該 commit 的訊息寫「README 的信任度表與 CHANGELOG 同步更新」,
+而 **README 一個字都沒動**(`git show --stat` 只有 CHANGELOG / misjudgments / reviews 三檔)。
+
+成因:批次改檔的腳本在 README 那一段 `assert` 失敗、整段中止(anchor 用半形逗號,
+檔案是全形),而**我沒有檢查 `--stat` 就 commit 並 push**。
+
+**這是本 repo 到目前為止最嚴重的一次。** 前面幾條是程式與註解不符;
+這一條是 **commit 訊息與 diff 不符,而且已經推出去了**。
+commit 訊息改不了,以本節與 `misjudgments.md` 為準。README 已於下一個 commit 補上。
+
+⇒ 教訓:**批次改多檔的腳本失敗時會靜默留下半套** ——
+commit 前一律看 `git show --stat` 對照訊息宣稱的檔案清單。
+
 ### 首批 craft 判讀(2026-09-02):判準會說「不」,但成因集中
 
 **主判的第一次實測。** 6 份真實 README,23 個已判維度標記:good 15 / mixed 5 / poor 3。
