@@ -31,7 +31,9 @@
 
 ## 待處理
 
-**目前 8 條(批次 #3 蓄積中,⚠️ 依 2026-09-02 裁定「先蓄積不處理」)** ——
+**目前 11 條(批次 #3;實驗室 8 + 真實使用 3)——已達批次門檻,B1 落地後即處理** ——
+真實使用的 3 條(B1 批次撈到,全文 `reviews/2026-09-02-use-batch-b1.md`)正是裁定
+等待的觸發事件;既有實驗室列的活化證據亦已累積(R-005 匿名縫 ×5、量詞縫 ×3)。原按語:
 全部來自第二輪盲判(D/E/F × rubric 0.3.0)的 friction 收斂,
 見 [`reviews/2026-09-02-blind-rejudge-030.md`](reviews/2026-09-02-blind-rejudge-030.md)。
 **下一個有權觸發條文修訂的事件是真實審查中的誤判**,不是第三輪實驗室盲判
@@ -47,6 +49,10 @@
 | 2026-09-02 | 盲判R2(E#1 明文;D good/E good/F mixed) | R-002 library 豁免 vs mapping 示例 | 豁免「npm install 之缺」;mapping 點名「照貼缺件」傷基礎 | **choo 旗艦例 require 未列裝的套件**恰落兩條文交集——豁免涵不涵蓋「缺口讓旗艦例貼了就壞」要明說;F#6 併記:同型瑕疵在最短路徑上/外是否同罪 |
 | 2026-09-02 | 盲判R2×2(E#9#10/F#3,承 R1) | R-003 基礎連言 + 清單描述門檻 | 「附理由;有例子」分號並列 | **半達成落哪格無裁決線**(httpie 例強理由薄);清單描述缺席率(sindre 機械計數 30%)無門檻——R-003 是本輪唯一下滑維度(83.3→75.0),縫在這與 linux 形狀 |
 | 2026-09-02 | 盲判R2×2(D#9/F#8) | R-005 求助管道最低構成 | 主體有六種正形式,管道只有反例 | **contributing guide / 廣播型 Twitter 算不算「去哪問」無定義**——sindre R-005 2:1;F#8 併記:主體名只活在 href、散文匿名時算哪邊。單源併記:E#8(序4/序5 同值)、D#6(陳述須在 README 內?)、D#5(驗證方式的外部排除範圍)、F#9(章節級陳述涵蓋範圍)、E#4(序2 vs 序4 誘因怪象)。⚠️ **2026-09-02 真實使用 #1 重現本縫**(skill-quality-research README:純「我們」組織聲音+散文零具名,照條文 good 但讀者答不出「我們是誰」——與 sindre 格同縫反向,見 `reviews/2026-09-02-use-skill-quality-research.md`) |
+| 2026-09-02 | 真實使用 B1(backup-worker) | `github_slug` emoji 標題 | 23 個 anchor 死鏈全假陽性 | **條文自記的「emoji slug 未實測」已知近似被真實語料否證**:`## 📖 概述` → GitHub 移除 emoji 後**前導空白轉 hyphen、不 trim** → 實際 anchor `#-概述`;我們 `strip()` 後算 `概述`。ground truth = 作者從 GitHub UI 抄的 TOC(與 public-apis 案同型)。修法:slug 流程去掉 strip(或改為只去尾)並補夾具 |
+| 2026-09-02 | 真實使用 B1(AI-SOP-Protocol) | S-001 `PIPE_TO_SHELL` | README 有 `bash <(curl …)` ×4 與 `irm … \| iex` ×2,security 報 **0** | **兩種下載執行形全盲**:regex 只認管道形。實測三句對照:管道形命中、行程替換與 PowerShell iex 皆 False。修法:補 `<\(\s*curl|wget` 行程替換分支與 `irm/iwr … \| iex` 分支,極性照 S-001 慣例(標示≠扣分) |
+| 2026-09-02 | 真實使用 B1(backup-worker) | R-004 `equivalent_forms` 的「自動更新 badge」 | `Tests-52/52` static shields 被誤導性計入同步 | **寫死數字扮成 badge**:`img.shields.io/badge/...` 是靜態圖,不是服務端渲染;現行措辭會讓判讀者把假 badge 計為機械同步。修法:補「動態 badge(值由服務端渲染)才算;`/badge/` 路徑的 static shields 是裸宣稱」判別字 |
+
 
 ## 待測(儀器目前做不到,**不佔處理額度**)
 
