@@ -23,6 +23,21 @@ import os
 import re
 import sys
 
+# Windows 可攜性:輸出重導向時 Python 用 locale 編碼(cp1252/cp950),本工具的訊息含中文,
+# 不處理會直接 UnicodeEncodeError 而不是印出結果。**出貨工具必須自己站得住**,
+# 不能要求使用者先設 PYTHONUTF8=1。(reconfigure 是 3.7+;失敗就維持原狀,不擋主流程。)
+#
+# ⚠️ 這一段是 2026-09-02 首次 CI 紅燈補上的。在此之前 CI 的 windows job 註解寫著
+# 「刻意用 PYTHONUTF8=0 驗證 lint 自己 reconfigure 得起來」—— 而**程式碼裡根本沒有
+# reconfigure**。CI 步驟是從姊妹專案抄來的,對應的實作沒跟著抄。
+# **註解宣稱了一個程式沒有的行為**,正是本工具自己在抓的形態。
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        try:
+            _stream.reconfigure(encoding="utf-8")
+        except (OSError, ValueError):
+            pass
+
 MAX_READ = 2_000_000
 README_NAMES = ("readme.md", "readme.markdown", "readme.rst", "readme.txt", "readme")
 

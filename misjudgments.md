@@ -51,5 +51,6 @@
 
 | 日期 | 對象 | 規則 | 處置 |
 |------|------|------|------|
+| 2026-09-02 | 本 repo(CI 註解) | `windows` job 的「驗證 reconfigure」 | **已修。註解宣稱了程式沒有的行為。** CI 步驟從姊妹專案抄來、寫著「刻意用 `PYTHONUTF8=0` 驗證 lint 自己 reconfigure 得起來」,而 `lint_readme.py` **根本沒有 reconfigure** —— 首次 CI 的 windows job 直接 `UnicodeEncodeError`。⇒ 補上 stdout/stderr 的 `reconfigure`;本機用 `PYTHONIOENCODING=cp1252` 重現,修前 rc=1 修後 rc=0。⚠️ **教訓:抄 CI 步驟時要一起抄它所驗證的實作** —— 否則那個步驟驗的是一句空話 |
 | 2026-09-01 | 本 repo(selftest) | `OBEY_KNOWN_UNCOVERED` / `SECRET_KNOWN_UNCOVERED` | **已修。突變測試抓到兩條恆真斷言。** 兩組夾具都**不含觸發語** —— `not obey_remote_hits(u)` 與 `not secret_hits(u)` 因此永遠成立,拿掉否定詞消音/佔位符過濾都不會轉紅。已改為「必須同時含觸發語與否定詞」「必須讓 `REAL_SECRET` 真的命中」,並加**前置斷言**強制夾具自證有行使該路徑 |
 | 2026-09-01 | 本 repo(selftest) | F1 回歸夾具(註解遮蔽) | **已修。夾具沒有鑑別力。** 本解析器逐行 `finditer`、**後者覆蓋前者**,而第一版把註解放在真值**之前** → 真值蓋掉註解,斷言恆真。已改為註解在**後**。重測確認:只拿掉剝註解 🟢、只放寬行首錨 🟢、**兩層同時拿掉才 🔴** —— 兩層防護各自獨立有效 |

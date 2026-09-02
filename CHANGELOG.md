@@ -50,6 +50,17 @@
    於是把 fixture 的安裝段標題改壞**不會轉紅**(H-003 是 warning)。
    已補 `hygiene_pass` 逐條釘住。
 
+### 首次 CI 紅燈:我自己的註解在說謊
+
+`windows` job 的步驟註解寫著「刻意用 `PYTHONUTF8=0` 驗證 lint 自己 reconfigure 得起來」,
+而 **`lint_readme.py` 裡根本沒有 reconfigure** —— CI 步驟是從姊妹專案抄來的,
+對應的實作沒跟著抄。結果:首次 CI `windows` job 直接 `UnicodeEncodeError`(cp1252)。
+
+**註解宣稱了一個程式沒有的行為**,正是本工具自己在抓的形態,而它出現在 day 0 的自己身上。
+
+⇒ 已補上 stdout/stderr 的 `reconfigure(encoding="utf-8")`。
+本機用 `PYTHONIOENCODING=cp1252` 重現:**修前 rc=1、修後 rc=0**。
+
 ### 首次自審撈到的(已入 misjudgments)
 
 用它審自己的 README:H-004(fence 未標語言)與 H-005(死連結)是**真缺口,已修**;
