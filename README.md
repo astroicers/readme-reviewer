@@ -17,9 +17,10 @@
 /plugin install readme-reviewer@readme-reviewer
 ```
 
-⚠️ **這兩行的證據強度**：格式與命名慣例照 `installed_plugins.json` 的真實 key
-（`<plugin>@<marketplace>`）與 8 個運作中的 marketplace 對過，
-**但沒有在乾淨環境端到端跑過**。裝不起來請開 issue——我們不替沒跑過的事背書。
+✅ **這兩行的證據強度**：**2026-09-02 端到端實跑一次全綠**（headless CLI：
+`claude plugin marketplace add astroicers/readme-reviewer` → `install -y`，
+裝得 0.4.0、內容與 main 一致）。範圍誠實：作者機上跑的、非全新使用者環境，
+互動式 `/plugin` UI 未驗。裝不起來請開 issue——版本再變會重驗。
 
 **或裝成 skill**（symlink，repo 更新自動生效）：
 
