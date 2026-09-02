@@ -391,7 +391,7 @@ def selftest():
     assert github_slug("Getting Started!") == "getting-started"
     with tempfile.TemporaryDirectory() as td:
         os.makedirs(os.path.join(td, "docs"))
-        open(os.path.join(td, "docs", "a.md"), "w").write("x")
+        open(os.path.join(td, "docs", "a.md"), "w", encoding="utf-8").write("x")
         md = "# T\n\n## 章節\n\n[ok](docs/a.md) [self](#章節) [dead](docs/nope.md) [anc](#nope)\n"
         open(os.path.join(td, "README.md"), "w", encoding="utf-8").write(md)
         bad = broken_links(md, td, "README.md")
@@ -467,6 +467,39 @@ def selftest():
     assert not _missing, (
         f"這些進入點會印非 ASCII 卻沒有 stdout/stderr 的 reconfigure,"
         f"在 Windows 重導向時會 UnicodeEncodeError:{_missing}")
+    # 同一根因的另外兩種面貌 —— **寫者側修好不等於讀者側也好了**。
+    # 三次 Windows CI 紅燈換來的清單:encode(stdout)、decode(subprocess)、open()。
+    # 同一根因的另外兩種面貌 —— **寫者側修好不等於讀者側也好了**。
+    # 三次 Windows CI 紅燈換來的清單:encode(stdout)、decode(subprocess)、open()。
+    #
+    # ⚠️ **本檔自己不在掃描範圍內,而且那是刻意的。** 前三版試著讓它掃自己,
+    # 連續踩了三個自我指涉:偵測器的字面字串命中自己、逐行標記漏了訊息字串、
+    # 連 sentinel 的偵測行都含 sentinel。**靜態掃自己是條爛路。**
+    # 本檔改用**更強的驗證**:CI 的 windows job 在 `PYTHONUTF8=0` 下直接執行本檔
+    # —— 那是行為驗證,比 grep 自己的原始碼可靠。
+    _self = os.path.abspath(__file__)
+    _enc = []
+    for _dp, _dn, _fn in os.walk(_root):
+        _dn[:] = [d for d in _dn if d not in (".git", "__pycache__", "fixtures")]
+        for _f in _fn:
+            if not _f.endswith(".py") or os.path.abspath(os.path.join(_dp, _f)) == _self:
+                continue
+            _rel = os.path.relpath(os.path.join(_dp, _f), _root)
+            for _i, _l in enumerate(read_text(os.path.join(_dp, _f)).splitlines(), 1):
+                if _l.lstrip().startswith("#"):
+                    continue
+                # ⚠️ 檢查**整行**有沒有 `encoding=`,不是 open() 的括號內 ——
+                # `open\(([^)]*)\)` 會被巢狀括號截斷:
+                # `open(os.path.join(a, b), encoding="utf-8")` 的 `[^)]*` 停在
+                # `os.path.join(` 的右括號,於是看不到後面的 encoding(實測踩過)。
+                _has_enc = "encoding=" in _l
+                if ("text=True" in _l or "universal_newlines=True" in _l) and not _has_enc:
+                    _enc.append(f"{_rel}:{_i} subprocess text=True 未指定 encoding")
+                if re.search(r"(?<![\w.])open\s*\(", _l) and not _has_enc \
+                        and not re.search(r"[\"']\s*[rwa]b[\"']", _l):
+                    _enc.append(f"{_rel}:{_i} open() 未指定 encoding")
+    assert not _enc, ("這些 I/O 邊界會吃 Windows 的 locale 編碼(cp1252),"
+                      f"三次 CI 紅燈都出在這一類:{_enc}")
 
     print("[selftest] lint_readme: 全部通過 ✔"
           f"(rollup 6 規則 + n/a 邊界 + 鍵/值域守衛;"

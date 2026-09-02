@@ -51,6 +51,7 @@
 
 | 日期 | 對象 | 規則 | 處置 |
 |------|------|------|------|
+| 2026-09-02 | 本 repo(可攜性) | `subprocess text=True` 吃 locale 編碼 | **已修,這是第三次紅燈、同一根因的第三種面貌。** 前兩次修的是**寫者側**(stdout encode);這次是**讀者側** —— `subprocess.run(text=True)` 在 Windows 用 cp1252 解子行程的 UTF-8 stdout → `UnicodeDecodeError` → `r.stdout` 變 None → `json.loads(None)` TypeError。⇒ 不再逐個修,改為**列出整個編碼邊界**(encode / decode / open)並加守衛。⚠️ 守衛自己連踩三個自我指涉:偵測器字面命中自己、逐行標記漏了訊息字串、**連 sentinel 的偵測行都含 sentinel**。**靜態掃自己是條爛路** ⇒ 改為不掃自己那一支,因為它有更強的驗證(CI 在 `PYTHONUTF8=0` 下直接執行它)。五種突變全數轉紅 |
 | 2026-09-02 | 本 repo(可攜性) | reconfigure 只補了報紅的那一支 | **已修,但這是第二次紅燈。** 第一次修完 CI 再紅一次,失敗步驟換成 `Eval regression` —— `run_evals.py` 同樣印中文、同樣沒有 reconfigure,而我**只修了報紅的那一支、也只重現了那一支**。⇒ 改為對全 repo 的 Python 進入點做系統性檢查,並加一條 selftest 守衛。⚠️ 守衛第一版寫 `"reconfigure" not in _src` —— **註解裡就有那個字**,於是它被自己的說明文字餵飽、突變不轉紅。已改為比對**呼叫**且要求帶 `encoding=` 參數。三種突變(換 pass / 刪整段 / 沒 encoding)全數轉紅。⚠️ **教訓:修的是那一支,還是那一類?** 以及**守衛不要用字面字串比對它自己會提到的詞** |
 | 2026-09-02 | 本 repo(CI 註解) | `windows` job 的「驗證 reconfigure」 | **已修。註解宣稱了程式沒有的行為。** CI 步驟從姊妹專案抄來、寫著「刻意用 `PYTHONUTF8=0` 驗證 lint 自己 reconfigure 得起來」,而 `lint_readme.py` **根本沒有 reconfigure** —— 首次 CI 的 windows job 直接 `UnicodeEncodeError`。⇒ 補上 stdout/stderr 的 `reconfigure`;本機用 `PYTHONIOENCODING=cp1252` 重現,修前 rc=1 修後 rc=0。⚠️ **教訓:抄 CI 步驟時要一起抄它所驗證的實作** —— 否則那個步驟驗的是一句空話 |
 | 2026-09-01 | 本 repo(selftest) | `OBEY_KNOWN_UNCOVERED` / `SECRET_KNOWN_UNCOVERED` | **已修。突變測試抓到兩條恆真斷言。** 兩組夾具都**不含觸發語** —— `not obey_remote_hits(u)` 與 `not secret_hits(u)` 因此永遠成立,拿掉否定詞消音/佔位符過濾都不會轉紅。已改為「必須同時含觸發語與否定詞」「必須讓 `REAL_SECRET` 真的命中」,並加**前置斷言**強制夾具自證有行使該路徑 |

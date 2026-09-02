@@ -61,6 +61,25 @@
 ⇒ 已補上 stdout/stderr 的 `reconfigure(encoding="utf-8")`。
 本機用 `PYTHONIOENCODING=cp1252` 重現:**修前 rc=1、修後 rc=0**。
 
+### 第三次 CI 紅燈:寫者側修好不等於讀者側也好了
+
+`UnicodeDecodeError`(decode,不是 encode)。`subprocess.run(text=True)` 在 Windows
+用 **locale 編碼**解子行程的 stdout,而子行程寫的是 UTF-8 → `r.stdout` 變 None →
+`json.loads(None)` 拋 TypeError。
+
+**同一根因(Windows locale 編碼)的第三種面貌**:encode(stdout)、decode(subprocess)、open()。
+
+⇒ 停止逐個修。列出**整個編碼邊界**,守衛一次涵蓋三類。
+
+⚠️ **守衛自己連踩三個自我指涉**:偵測器的字面字串命中自己 → 加逐行標記卻漏了訊息字串 →
+改用起訖 sentinel,而**連 sentinel 的偵測行都含 sentinel 字串**。
+**靜態掃自己是條爛路。** ⇒ 最終設計:守衛**不掃自己那一支**,
+因為那一支有更強的驗證 —— CI 的 windows job 在 `PYTHONUTF8=0` 下**直接執行**它。
+**行為驗證比 grep 自己的原始碼可靠。**
+
+負向驗證:五種突變(subprocess 拿掉 encoding / reconfigure 換 pass / 改 `errors=` /
+open 拿掉 encoding / 整段刪掉)**全數轉紅**。
+
 ### 第二次 CI 紅燈:修的是那一支,不是那一類
 
 補完 `lint_readme.py` 的 reconfigure 後 CI 再紅一次,失敗步驟換成 `Eval regression`

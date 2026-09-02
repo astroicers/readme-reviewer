@@ -46,8 +46,12 @@ def _lint_module():
 
 
 def lint(repo, *extra):
+    # ⚠️ `text=True` 在 Windows 用 **locale 編碼**解子行程的 stdout(cp1252),
+    # 而子行程寫的是 UTF-8 → UnicodeDecodeError,`r.stdout` 變 None,
+    # 接著 `json.loads(None)` 拋 TypeError。**寫者側修好不等於讀者側也好了。**
+    # 這是同一個根因(Windows locale 編碼)的第三種面貌,也是第三次 CI 紅燈。
     r = subprocess.run([sys.executable, LINT, repo, "--json", *extra],
-                       capture_output=True, text=True)
+                       capture_output=True, text=True, encoding="utf-8")
     if r.returncode != 0:
         raise AssertionError(f"lint 執行失敗 rc={r.returncode}: {r.stderr[:200]}")
     return json.loads(r.stdout)
