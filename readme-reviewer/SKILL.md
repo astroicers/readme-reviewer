@@ -3,7 +3,7 @@ name: readme-reviewer
 description: 審查任意 GitHub repo 的 **README 寫得好不好**,輸出形狀感知的診斷。Use when 使用者要求 review README、審查專案說明文件、評估 GitHub repo 的 README 品質、問「我的 README 寫得如何/缺什麼」、或要為新專案寫 README 前想知道判準。**主判是 craft 質化判讀(R-001~005:第一屏定位 / 最短可執行路徑 / 寫作品質 / 限制誠實 / 求助與維護),lint 只是先跑的 hygiene 與安全過濾器,其分數不是品質結論。** 輸出三段式:craft verdict + 形狀與缺口 + 分維度 findings。
 license: MIT
 metadata:
-  rubric_version: "0.2.0"
+  rubric_version: "0.3.0"
   evidence: "triangulation(公開規範 + 質化樣態),**非**星數梯度——見 references/rubric.yaml 的證據性質段"
 ---
 
@@ -68,11 +68,15 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
 | **awesome / 清單** | 本體是連結集 | **R-002 判 N/A**；由 R-001（收錄範圍）與 R-003（分類與描述品質）主導 |
 | **monorepo** | 根 README 只做路由 | 不因根 README 薄扣分；**以子套件 README 抽樣**評分 |
 | **索引/導覽型** | 本體是**指向他處的目錄**（文件路由、讀者分流） | R-002 認「**怎麼開始讀/從哪進入**」；R-003 判**分類與導覽結構**品質（不要求規則因果）；R-004 照常（repo 內相對指向計入機械同步） |
+| **hosted 服務門面** | codebase repo，產品本體是託管服務 | R-002 認**消費路徑**（打開服務）與**貢獻路徑**（本地跑起來）**擇一完整**；兩者皆缺才降 |
 | **模板 / starter** | 給人 fork 當起點 | R-002 認「**怎麼用這個模板**」而非「怎麼安裝」 |
 
 **關鍵**：rubric 條款裡本來就有這些例外（`exemption`、`equivalent_forms`、
 `disambiguation`、`decision_order`）。誤判多半不是條款缺失，而是**審查者沒去查對應例外**。
 判完形狀後，到 `references/rubric.yaml` 找該準則的例外欄位再下判。
+
+⚠️ **形狀由 artifact 主體決定，不由 README 內容反推**——「它是什麼」看 repo 裝的是什麼，
+「寫得好不好」才看 README。用 README 薄厚回推形狀會倒果為因（盲判實測抓到的分歧源）。
 
 ### 步驟 4：質化審 craft（**這是你的核心工作，lint 做不到**）
 
@@ -83,12 +87,18 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
   badge 不是罪——判準是**它們有沒有把定位擠掉**。
 - **R-002 最短可執行路徑**：指令可貼嗎？**前置條件說了嗎**？成功長什麼樣？
 - **R-003 寫作品質**：關鍵選擇附理由嗎？有具體例子/輸出樣張，還是只有形容詞？
-- **R-004 限制誠實**：說了什麼時候**不該**用嗎？易腐內容（版本、API、定價、效能數字）有時效標記嗎？
-  ⚠️ 照 `decision_order` 走——**「沒有限制陳述」與「沒有東西會過期」是兩回事**；
-  「指向單一事實源 / repo 內相對路徑 / 機械同步標記」是**等價的驗證形式**，不是缺席。
+- **R-004 限制誠實**：說了什麼時候**不該**用嗎？**載重宣稱**（讀者會據以行動的版本、
+  API、定價、效能/統計數字）有時效標記嗎？
+  ⚠️ 先查 `scope_of_perishable`（範例內的 pin、修辭形容、外部連結本體**不算**易腐）
+  與 `statement_test`（陳述須**對讀者的選擇有排除力**），再照 `decision_order` 走。
 - **R-005 求助與維護**：讀者卡住時知道去哪求助嗎？知道由誰、以什麼狀態維護嗎？
-  ⚠️ 照 `decision_order` 走——**缺席最多 mixed，poor 只給「寫了但已失效/誤導」**；
+  ⚠️ 照 `decision_order` 走——**缺席最多 mixed，poor 只給「寫了但已失效/誤導」**
+  （引用鏈腐世界知識須在證據欄具名）；命中 anti-pattern 有自己的格位（mixed）；
   「本專案不提供支援」是合格答案；內部工具判 `n/a`。
+
+⚠️ **R-004 與 R-005 的證據欄必須記「走到 decision_order 第幾序」**——
+序 2 與序 3 殊途同歸 mixed，不記序號,判讀者間的路徑分歧在輸出層不可見
+（盲判實測三位判讀者已自發這樣做，自 0.3.0 起為必填）。
 
 **每一個維度都要有值，不得略過。** 判 `good` 也要附證據——
 「找不到問題」和「查過而且它做對了」是兩件事。
