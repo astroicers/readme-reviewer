@@ -18,6 +18,17 @@ import os
 import subprocess
 import sys
 
+# Windows 可攜性:本檔的契約名稱含中文,重導向時走 locale 編碼會 UnicodeEncodeError。
+# ⚠️ 2026-09-02:第一次修這個問題時**只補了 lint_readme.py**(那支才是報紅的),
+# run_evals.py 同樣印中文卻漏掉 —— 於是 CI 再紅一次,失敗步驟換成 `Eval regression`。
+# **修的是報紅的那一支,不是同一類的全部。** 現在改為對每個 Python 進入點系統性檢查。
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        try:
+            _stream.reconfigure(encoding="utf-8")
+        except (OSError, ValueError):
+            pass
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 LINT = os.path.join(os.path.dirname(HERE), "scripts", "lint_readme.py")
 FIXTURES = os.path.join(HERE, "fixtures")

@@ -443,10 +443,35 @@ def selftest():
     assert parse_rubric_block(masked, "security")["S-002"]["severity"] == "error", \
         "解析器讀到了談論舊值的註解而非真值(塊內註解可遮蔽 drift-guard)"
 
+    # ── 可攜性守衛:每個會印中文的 Python 進入點都必須有 reconfigure ──────────
+    # ⚠️ 這條是 2026-09-02 兩次 Windows CI 紅燈換來的。第一次是 CI 註解宣稱了
+    # 程式沒有的行為;第二次是我**只修了報紅的那一支**,run_evals.py 同樣印中文卻漏掉。
+    # 現在由程式檢查整個 repo,而不是等 Windows runner 一支一支告訴我。
+    _root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    _missing = []
+    for _dp, _dn, _fn in os.walk(_root):
+        _dn[:] = [d for d in _dn if d not in (".git", "__pycache__", "fixtures")]
+        for _f in _fn:
+            if not _f.endswith(".py"):
+                continue
+            _src = read_text(os.path.join(_dp, _f))
+            _is_entry = "__main__" in _src
+            _prints_cjk = any(ord(c) > 127
+                              for _m in re.findall(r"print\(([^\n]*)", _src) for c in _m)
+            # ⚠️ 比對的是**呼叫**而非字面字串:註解裡本來就有 "reconfigure" 這個字,
+            # 用 `in _src` 會被自己的說明文字餵飽 —— 那正是本守衛要抓的形態。
+            # 也要求帶 encoding 參數:`reconfigure(errors=...)` 修不了編碼問題。
+            _has_call = re.search(r"\.reconfigure\s*\(\s*encoding\s*=", _src)
+            if _is_entry and _prints_cjk and not _has_call:
+                _missing.append(os.path.relpath(os.path.join(_dp, _f), _root))
+    assert not _missing, (
+        f"這些進入點會印非 ASCII 卻沒有 stdout/stderr 的 reconfigure,"
+        f"在 Windows 重導向時會 UnicodeEncodeError:{_missing}")
+
     print("[selftest] lint_readme: 全部通過 ✔"
           f"(rollup 6 規則 + n/a 邊界 + 鍵/值域守衛;"
           f"drift-guard 比對 {checked}/{len(SECURITY_RULES)} 條 severity+confidence"
-          f" 與 5 條 hygiene;其餘斷言皆 tempfile 自建,無外部路徑依賴)")
+          f" 與 5 條 hygiene;另檢查全 repo 進入點的 UTF-8 reconfigure)")
     return 0
 
 

@@ -61,6 +61,20 @@
 ⇒ 已補上 stdout/stderr 的 `reconfigure(encoding="utf-8")`。
 本機用 `PYTHONIOENCODING=cp1252` 重現:**修前 rc=1、修後 rc=0**。
 
+### 第二次 CI 紅燈:修的是那一支,不是那一類
+
+補完 `lint_readme.py` 的 reconfigure 後 CI 再紅一次,失敗步驟換成 `Eval regression`
+—— `run_evals.py` 同樣印中文、同樣沒有 reconfigure。**我只修了報紅的那一支,
+本機也只重現了那一支**,所以看不到。
+
+⇒ 改為系統性檢查:selftest 新增一條守衛,掃全 repo 的 Python 進入點,
+凡「會印非 ASCII 且是進入點」就必須有 `reconfigure(encoding=...)`。
+
+⚠️ **守衛第一版自己也有同型缺陷**:它寫 `"reconfigure" not in _src`,
+而**註解裡就有那個字** —— 它被自己的說明文字餵飽,突變不轉紅。
+已改為比對**呼叫**並要求帶 `encoding=` 參數。
+三種突變(換 `pass` / 刪整段 / 改成 `errors=`)全數轉紅。
+
 ### 首次自審撈到的(已入 misjudgments)
 
 用它審自己的 README:H-004(fence 未標語言)與 H-005(死連結)是**真缺口,已修**;
