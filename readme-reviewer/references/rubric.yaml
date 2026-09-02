@@ -22,8 +22,7 @@ rubric_version: "0.2.0"
 
 triangulation_sources:
   status: |
-    ⚠️ **部分查證(2026-09-02)**。三個來源已逐條開啟原文核對,兩個仍待查證。
-    **未查證者的引用只有中等證據強度** —— 這條紀律不因其他來源查過而放寬。
+    ✅ **六個來源全數逐條查證(2026-09-02;姊妹專案筆記為同作者資料,按非獨立折扣)。**
     ⚠️ 查證的是「**來源說了什麼**」,不是「**本 rubric 的權重對不對**」。
     來源查證**不會**把「選的權重」升級成「量出來的權重」;證據性質段那句仍然成立。
   sources:
@@ -70,11 +69,30 @@ triangulation_sources:
         **兩種讀法資料分不開。** 能寫下的只有:R-004 目前**無外部支持**
         (它在首兩批的觸發集中度見批次報告;decision_order 已於 0.2.0 改寫)。
     - source: "Make a README(makeareadme.com)—— 最小可用 README 的組成"
-      verified: null
-      note: "⏳ 待查證。憑既有知識引用,中等證據強度。"
+      verified: "2026-09-02"
+      found: |
+        建議段落含 **Support**("Tell people where they can go to for help. It can be
+        any combination of an issue tracker, a chat room, an email address, etc.")、
+        **Authors and acknowledgment**、**Project status**("If you have run out of
+        energy or time… put a note at the top of the README saying that development
+        has slowed down or stopped completely")、Installation / Usage("show the
+        expected output if you can")。
+      gap_against_this_rubric: |
+        對 R-005 是**第三個獨立來源**(Support + Authors);
+        「Project status 放頂部」獨立佐證 R-004 的維護狀態陳述條款,
+        也佐證 R-005 的「不維護了要明說」讀法。
+        Usage 的 "show the expected output" 佐證 R-002 高分要件。
     - source: "Diátaxis / Divio documentation system —— tutorial / how-to / reference / explanation 四象限"
-      verified: null
-      note: "⏳ 待查證。憑既有知識引用,中等證據強度。"
+      verified: "2026-09-02"
+      found: |
+        "Diátaxis identifies four distinct needs, and four corresponding forms of
+        documentation — tutorials, how-to guides, technical reference and explanation."
+        "Crossing or blurring the boundaries… is at the heart of a vast number of
+        problems in documentation."(explanation = "context and background… the need
+        to understand",佐證 R-003 的 why-vs-what 區分)
+      gap_against_this_rubric: |
+        ⚠️ **該框架沒有任何 README 專屬指引**(它談的是文件系統)——
+        對本 rubric 的適用是**間接推衍**,引用時證據強度按此折扣。
     - source: "skill-quality-research 的 54 份質化筆記 —— 寫作工藝樣態(why 密度、Bad/Good 對照、override 節)"
       verified: "2026-09-01"
       note: "同一作者的姊妹專案,已進版控可直接查閱;**非獨立第三方**,證據強度按此折扣。"
