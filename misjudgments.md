@@ -31,22 +31,14 @@
 
 ## 待處理
 
-**目前 9 條(批次 #2 蓄積中)** —— 全部來自三位不知情判讀者的盲判收斂
-([`reviews/2026-09-02-blind-rejudge-020.md`](reviews/2026-09-02-blind-rejudge-020.md),
-其中 6 條是雙方或三方**獨立**點名同一縫,證據等級高於作者自查)。
-批次 #1 的 12 條已於同日處理完畢(8 修 / 2 刻意不修 / 2 記分歧,見已處理表)。
+**目前 0 條** —— 批次 #2 的 10 條(盲判收斂 9 + verbatim 補登 1)已於
+2026-09-02 處理完畢(**9 修 / 1 刻意不修**),見
+[`reviews/2026-09-02-misjudgment-batch-2.md`](reviews/2026-09-02-misjudgment-batch-2.md)。
+⇒ rubric **0.3.0** / 工具 **0.3.0**。批次 #1(12 條)與 #2 皆見已處理表。
 
 | 日期 | 對象 | 規則 | 它說什麼 | 我認為應該是什麼 |
 |------|------|------|----------|------------------|
-| 2026-09-02 | 盲判×3(A#1/B#2/C#1) | R-004 decision_order 量詞 | 「易腐內容帶時效標記」「易腐內容裸露」 | **全稱還是存在讀未定**;真實 README 幾乎都是混合體(載重宣稱有標記+邊角裸露),兩序同真,三位各自現場立法。httpie/size-limit/fCC 因此三方走不同序 |
-| 2026-09-02 | 盲判×3(A#2/B#1/C#2) | R-004 的「易腐內容」定義 | 例示全是宣稱型(版本/API/定價/效能) | **外部連結本體算不算沒裁決**——清單型的本體就是數百條外鏈。sindre 的 R-004 因此在取值域出現三個值(poor/n/a/mixed),三個出口各有合法讀法。⚠️ shapes.md 對 awesome 型調整了 R-001/002/003 卻對 R-004 沉默 |
-| 2026-09-02 | 盲判×3(A#6/B#4/C#4) | R-004 序 1 的「陳述」 | 「有限制/非目標/適用邊界/維護狀態陳述」 | **最低強度未定義**——「JSX is not required」「opinionated」「run locally for…」一個短語就翻 good↔mixed↔poor。三位都說這是 R-004 分歧面最大的縫之一 |
-| 2026-09-02 | 盲判×3(A#4/B#5/C#5)+作者 | R-005 anti_patterns vs decision_order | anti-pattern 明列「求助管道只在贊助商區塊」 | **decision_order 沒有它的落點**——守序者到 good、套 anti-pattern 者到 mixed,public-apis 實測 3:1 分裂。**雙向證實**:三位獨立點名脫鉤,作者判定恰好走另一邊。修法二選一:接進 order(命中 anti-pattern → mixed)或刪掉 |
-| 2026-09-02 | 盲判×3(A#3/B#5/C#6) | R-004/R-005 的「已實際腐壞/已失效」 | choo 的 freenode/travis 判 poor | **依賴 README 之外的世界知識,條文沒說可不可採**——判準具名了 freenode 型鏈腐才救了這格;不知道該服務已死的判讀者會判 good(poor↔good 兩極)。要嘛明說允許並要求記錄鏈腐知識,要嘛降信心 |
-| 2026-09-02 | 盲判×2(A#5/B#11/C#10 部分) | craft_value_mapping 的 mixed 定義 | 「達成但有可指認的瑕疵 = mixed」 | **字面讀讓 good 不可達**(任何 README 都有 nitpick)——三位各自發明「瑕疵須傷及基礎要件」內規,而映射的開宗明義是「不得自選讀法」。瑕疵的位置(基礎要件內/外)要條文自己定義 |
-| 2026-09-02 | 盲判×3(A#9/B#7/C#7) | R-002 對「殼型 README」 | CLI「必須有可貼指令」;library「認 API 範例」 | **安裝委外 docs site 的殼型在 CLI 形狀無等價出口而 library 有**——dbt 實測 poor/mixed/poor 散開;react 的 install 豁免範圍也各表。是立場就明寫「外鏈安裝文件不豁免」,是疏漏就補等價形式 |
-| 2026-09-02 | 盲判×2(A#8/B#8) | 形狀表 | 缺「hosted SaaS 的 codebase repo」列 | fCC 形狀 2:1 分歧(應用/服務 vs 索引/導覽)且**直接翻 R-002**;hosted 產品最短路徑是「打開網站」,現行應用/服務列(docker/compose)套不上。⚠️ B#8 另點名:形狀由 README 內容反推會倒果為因 |
-| 2026-09-02 | 盲判×2(B#9/C#8)+(B#3/C#3/C#9 併記) | R-001 第一屏 + R-004 輸出解析度 | 「前 ~15 行」/序 2 與序 3 同值 | (a) HTML 頭部 README 的「第一屏」靠腦內渲染,raw 行數與渲染屏脫節(fiber 的 h1 塊 33 行)→ 需渲染近似規則;(b) R-004 序 2/序 3 殊途同歸 mixed,分歧在輸出層不可見 → evidence 強制記序號(三位已自發照做);(c) C#3:「有陳述+無易腐」在 order 裡沒有格子,靠空缺連言取真 |
+|（空）| | | | |
 
 ## 待測(儀器目前做不到,**不佔處理額度**)
 
@@ -61,6 +53,7 @@
 
 | 日期 | 對象 | 規則 | 處置 |
 |------|------|------|------|
+| 2026-09-02 | **批次 #2(10 條:盲判收斂 9 + verbatim 補登 1「主體指認邊界」A#7/B#6)** | 見 [`reviews/2026-09-02-misjudgment-batch-2.md`](reviews/2026-09-02-misjudgment-batch-2.md) | **9 修 / 1 刻意不修**,rubric 0.2.0→0.3.0、工具 0.2.0→0.3.0(純條文,零程式行為變更)。修:R-004 `scope_of_perishable`(載重宣稱;範例 pin/修辭形容/外部連結本體不算)+ `statement_test`(排除力判別法;清單型認收錄立場)+ 序 1 空缺連言明定 + 序號必記;R-005 anti-pattern 專屬格位(序 2 → mixed)+ 世界知識具名規則 + 主體指認三形式;craft_value_mapping 瑕疵位置;R-002 `delegation_stance`(CLI 外鏈不豁免/library 豁免安裝/hosted 擇一);形狀表 + hosted 服務門面列 + 「形狀由 artifact 決定」;R-001 渲染近似規則。刻意不修:**R-004 序 3 封頂 mixed**(B#3 反直覺成立,但機械同步只解決鮮度、不回答「何時不該用」——rationale 已寫進條文一行)。rollup 門檻不動 |
 | 2026-09-02 | **批次 #1(12 條)** | 見 [`reviews/2026-09-02-misjudgment-batch-1.md`](reviews/2026-09-02-misjudgment-batch-1.md) | **8 修 / 2 刻意不修 / 2 記分歧**,rubric 0.1.0→0.2.0、工具 0.1.0→0.2.0。修:H-002 撤 bare-name 扣分降 info;R-004 三出口→五出口(+機械同步 equivalent_forms);craft_value_mapping;形狀表+索引/導覽型;HEADING_RE 三語法+fence 遮罩;slug 逐空白;HTML 具名錨;H-005 前提文件化+稀疏 root 警示;**R-005 新增**(缺席不設 poor;內部工具 n/a)。刻意不修:H-004(抽查 6/6 輸出型,info 級);rollup `≥2 mixed` 門檻(重模擬無調整依據)。分歧:本 repo README 的 blockquote 定位句與 Standard Readme 相左,已於 README 註明。18 份重模擬:needs-revision 11→10、R-004 poor 10→7,數字由 `scripts/resimulate_18.py` 斷言並掛 CI。9/9 突變轉紅 |
 | 2026-09-02 | 本 repo(流程) | commit 訊息宣稱了沒發生的事 | **已公開更正。** `08e9e01` 的訊息寫「README 的信任度表與 CHANGELOG 同步更新」,而 **README 一個字都沒動** —— 批次改檔的腳本在 README 那一段 `assert` 失敗、整段中止,但我**沒有檢查 `git show --stat` 就 commit 並 push**。成因是 anchor 用半形逗號而檔案是全形。⚠️ **這是本 repo 到目前為止最嚴重的一次**:前面幾條是程式與註解不符,這一條是**commit 訊息與 diff 不符,而且已經推出去了**。⇒ 教訓:**批次改多檔的腳本失敗時會靜默留下半套**,commit 前一律看 `--stat` 對照訊息宣稱的檔案清單 |
 | 2026-09-02 | 本 repo(可攜性) | `subprocess text=True` 吃 locale 編碼 | **已修,這是第三次紅燈、同一根因的第三種面貌。** 前兩次修的是**寫者側**(stdout encode);這次是**讀者側** —— `subprocess.run(text=True)` 在 Windows 用 cp1252 解子行程的 UTF-8 stdout → `UnicodeDecodeError` → `r.stdout` 變 None → `json.loads(None)` TypeError。⇒ 不再逐個修,改為**列出整個編碼邊界**(encode / decode / open)並加守衛。⚠️ 守衛自己連踩三個自我指涉:偵測器字面命中自己、逐行標記漏了訊息字串、**連 sentinel 的偵測行都含 sentinel**。**靜態掃自己是條爛路** ⇒ 改為不掃自己那一支,因為它有更強的驗證(CI 在 `PYTHONUTF8=0` 下直接執行它)。五種突變全數轉紅 |
