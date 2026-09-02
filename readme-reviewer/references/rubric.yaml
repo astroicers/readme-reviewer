@@ -22,16 +22,62 @@ rubric_version: "0.1.0"
 
 triangulation_sources:
   status: |
-    ⚠️ **待查證(fact-check pending)**。下列來源是憑既有知識引用的,
-    **本輪未逐條開啟原文核對**。這一行本身就是本專案第一條誠實聲明:
-    在拿到查證前,任何「規範 X 說 Y」的引用都只有**中等**證據強度。
-    解除條件:逐條開啟原文、記錄查證日期與引用位置。
+    ⚠️ **部分查證(2026-09-02)**。三個來源已逐條開啟原文核對,兩個仍待查證。
+    **未查證者的引用只有中等證據強度** —— 這條紀律不因其他來源查過而放寬。
+    ⚠️ 查證的是「**來源說了什麼**」,不是「**本 rubric 的權重對不對**」。
+    來源查證**不會**把「選的權重」升級成「量出來的權重」;證據性質段那句仍然成立。
   sources:
-    - "GitHub Docs — About READMEs(README 的定位與 GitHub 的渲染行為)"
-    - "Standard Readme(RichardLitt/standard-readme)—— 章節順序與必要段落"
-    - "Make a README(makeareadme.com)—— 最小可用 README 的組成"
-    - "Diátaxis / Divio documentation system —— tutorial / how-to / reference / explanation 四象限"
-    - "skill-quality-research 的 54 份質化筆記 —— 寫作工藝樣態(why 密度、Bad/Good 對照、override 節)"
+    - source: "GitHub Docs — About READMEs"
+      verified: "2026-09-02"
+      found: |
+        README 應涵蓋五項:What the project does / Why the project is useful /
+        How users can get started / **Where users can get help** /
+        **Who maintains and contributes to the project**。
+        另:相對連結會依當前 branch 自動轉換(絕對連結在 clone 內可能失效);
+        GitHub 依標題自動產生 TOC;anchor 可從渲染後的標題直接複製。
+      gap_against_this_rubric: |
+        ⚠️ **後兩項在本 rubric 裡沒有任何維度承載**(R-001/002/003/004 都不判)。
+        已入 misjudgments,**本輪不修**。
+    - source: "Standard Readme(RichardLitt/standard-readme)spec.md"
+      verified: "2026-09-02"
+      found: |
+        必要段落與順序:Title / Short Description / Table of Contents /
+        Install / Usage / Contributing / License(Banner、Badges、Long Description、
+        Security、Background、API、Maintainers、Thanks 為選用)。
+        Title:"Title must match repository, folder and package manager names"。
+        Short Description:"Must not have its own title" / "Must be less than 120
+        characters" / "Must not start with `> `" / "Must be on its own line"。
+        Contributing:"State where users can ask questions"。
+        Maintainers:"List maintainer(s)… along with one way of contacting them"。
+      gap_against_this_rubric: |
+        ⚠️ **Title 規則與本 rubric 的 H-002 直接矛盾** —— spec 要求標題等於 repo 名,
+        H-002 正是在扣這個分。已入 misjudgments,**本輪不修**。
+        ⚠️ 本 repo 自己的 README 違反 Short Description 的三條規則(定位句在 blockquote 裡)。
+        **那是分歧不是錯誤**(GitHub Docs 無此規定),但引用了就要註明。
+    - source: "matiassingers/awesome-readme"
+      verified: "2026-09-02"
+      new_in: "2026-09-02"
+      found: |
+        120+ 個人工策展的 README,**逐條附收錄理由**。
+        抽樣六條理由的關鍵詞集中在:logo / banner / badge / screenshot / demo /
+        clear description / step-by-step installing instructions / TOC。
+      gap_against_this_rubric: |
+        ⚠️ **六條理由沒有一條提到 R-004 要的東西**(限制、非目標、易腐內容的時效標記),
+        也沒有一條提到 R-002 的前置條件。
+        ⚠️ **但這不足以推翻 R-004**:該策展標準本身高度偏視覺/打包面,
+        而姊妹專案的結論正是「打包面關聯星數、不關聯工藝」——
+        「偏打包面的標準不提 R-004」既可讀成 R-004 過重,也可讀成該標準沒在看工藝。
+        **兩種讀法資料分不開。** 能寫下的只有:R-004 目前**無外部支持**,
+        而它承擔了實測 12 個 poor 中的 10 個。已入 misjudgments,**本輪不修**。
+    - source: "Make a README(makeareadme.com)—— 最小可用 README 的組成"
+      verified: null
+      note: "⏳ 待查證。憑既有知識引用,中等證據強度。"
+    - source: "Diátaxis / Divio documentation system —— tutorial / how-to / reference / explanation 四象限"
+      verified: null
+      note: "⏳ 待查證。憑既有知識引用,中等證據強度。"
+    - source: "skill-quality-research 的 54 份質化筆記 —— 寫作工藝樣態(why 密度、Bad/Good 對照、override 節)"
+      verified: "2026-09-01"
+      note: "同一作者的姊妹專案,已進版控可直接查閱;**非獨立第三方**,證據強度按此折扣。"
 
 # ════════════════════════════════════════════════════════════════════════
 # observation-only:有數字,但**不得轉成權重**

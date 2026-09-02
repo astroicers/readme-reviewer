@@ -80,10 +80,16 @@ python3 readme-reviewer/scripts/lint_readme.py <repo 目錄> --json
 姊妹專案 [`skill-quality-research`](https://github.com/astroicers/skill-quality-research)
 的 packaging 權重來自 97 個 repo 的星數梯度，有 bootstrap CI 可查。**本專案沒有那個東西。**
 
-來源是 **triangulation**：公開規範（GitHub Docs / Standard Readme / Diátaxis）
-+ 該專案 54 份質化筆記收斂的寫作工藝樣態。
-⚠️ 那些來源目前標記為**待查證**——本輪未逐條開啟原文核對，
-[條文裡就是這樣寫的](readme-reviewer/references/rubric.yaml)。
+來源是 **triangulation**：公開規範 + 該專案 54 份質化筆記收斂的寫作工藝樣態。
+**2026-09-02 起三個來源已逐條開啟原文核對並附逐字引用**
+（GitHub Docs ✅ / Standard Readme `spec.md` ✅ / `matiassingers/awesome-readme` ✅）；
+**Make a README 與 Diátaxis 仍未查**，引用它們時只有中等證據強度
+（[查證狀態逐條寫在條文裡](readme-reviewer/references/rubric.yaml)）。
+
+⚠️ **查證來源不等於驗證權重。** 那三份查證改變的是「我們說某來源講了什麼」的可信度，
+**不改變**上面那句「權重是選的、不是量出來的」。而且查到的三件事**都是反證**：
+規範要求的兩個內容面本 rubric 零維度承載、Standard Readme 的 Title 規則與 H-002 直接矛盾、
+人工策展的收錄理由零次提及 R-004。
 
 **那為什麼還值得做？** 因為那個專案跑完六個 phase 的結論是
 **「星數關聯的是打包面，不是內容工藝——craft 才是主判」**。
@@ -99,7 +105,7 @@ craft-first + triangulation 是**遵循那個結論**，不是繞過它。
 | hygiene（H-001 存在性） | **可當硬門檻** | 確定性判定，無爭議 |
 | hygiene（H-002~005） | **當提示** | 有已知假陰性：logo 圖片取代 H1、awesome 清單無安裝段 |
 | security 紅旗 | **必須人工複核** | `confidence` 標低者假陽性高；S-003 有具名的極性反轉前科 |
-| **craft verdict** | **信「有沒有問題」，不信刻度** | 主判。首批 6 份實測 **3/6 needs-revision**——它會說「不」；但**成因高度集中於 R-004**，見下 |
+| **craft verdict** | **信「有沒有問題」，不信刻度** | 主判。兩批 18 份真實 README 實測 **11/18 needs-revision**——它會說「不」；但**成因高度集中於 R-004**，見下 |
 
 > ⚠️ **`≥2 mixed → needs-revision` 這個門檻是借來的。**
 >
@@ -107,17 +113,19 @@ craft-first + triangulation 是**遵循那個結論**，不是繞過它。
 > 而 `poor` 罕見——結果是**連續 41 個對象 41/41 全 `approved`**，
 > 史上零次由 craft 說「不」。**一個從來不說「不」的判準，跟橡皮圖章無法區分。**
 >
-> **2026-09-02 首批 6 份真實 README 實測：3/6 needs-revision——那個失敗模式沒有重演。**
+> **2026-09-02 兩批共 18 份真實 README 實測：11/18 needs-revision——那個失敗模式沒有重演。**
 >
-> ⚠️ **但 3 個 `poor` 全部出自 R-004，沒有一個來自其他三維。**
+> ⚠️ **但 12 個 `poor` 裡有 10 個出自 R-004。**
 > 而條文裡本來就寫著「本條若過度觸發，先懷疑它，不要先調門檻」——第一批就撞上了。
-> 成因：`decision_order` 的「有易腐內容且無限制陳述 → poor」對任何
-> listing/collection 型 README 幾乎恆真。已入 [`misjudgments.md`](misjudgments.md)，
-> **條文照紀律不動**。
+> 第二批把成因講得更精確：`decision_order` 的順序 2（無限制陳述**且**無易腐內容）
+> 對任何真實 README 幾乎不可能成立，於是實際只剩兩個出口，
+> **R-004 事實上是個二元開關**——18 份裡 `mixed` 只出現一次。
+> 已入 [`misjudgments.md`](misjudgments.md)，**條文照紀律不動**。
 >
-> ⚠️ **那批判讀者是我，而我寫了這份 rubric**——我知道 41/41 的教訓，**有動機讓它開火**。
+> ⚠️ **兩批的判讀者都是我，而我寫了這份 rubric**——我知道 41/41 的教訓，**有動機讓它開火**。
 > 全文與污染聲明見
-> [`reviews/2026-09-02-first-craft-batch.md`](reviews/2026-09-02-first-craft-batch.md)。
+> [`reviews/2026-09-02-first-craft-batch.md`](reviews/2026-09-02-first-craft-batch.md)（6 份）與
+> [`reviews/2026-09-02-two-frame-comparison.md`](reviews/2026-09-02-two-frame-comparison.md)（12 份，兩個抽樣框）。
 > **它只證明了這條路徑會輸出 needs-revision，沒有證明它判得準。**
 
 ## 判錯了怎麼辦
