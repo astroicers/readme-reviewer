@@ -1,0 +1,43 @@
+# 三位不知情判讀者的維度判定(2026-09-02,rubric 0.2.0,盲判包見報告 §協定)
+# 逐字證據與 friction 全文:同目錄 judge-{A,B,C}-verbatim.md
+# ⚠️ 含具名 craft 判定 —— 未來的判讀者禁讀本目錄(污染)
+judges:
+  A:
+    httpie_httpie:            {shape: "CLI 工具",     dims: [good,  mixed, good,  mixed, good]}
+    gofiber_fiber:            {shape: "library",      dims: [good,  good,  good,  good,  good]}
+    dbt-labs_dbt-core:        {shape: "CLI 工具",     dims: [good,  poor,  mixed, good,  good]}
+    ai_size-limit:            {shape: "CLI 工具",     dims: [good,  good,  good,  good,  mixed]}
+    amplication_amplication:  {shape: "應用/服務",    dims: [mixed, good,  mixed, mixed, good]}
+    choojs_choo:              {shape: "library",      dims: [good,  mixed, good,  mixed, poor]}
+    facebook_react:           {shape: "library",      dims: [good,  mixed, good,  good,  good]}
+    torvalds_linux:           {shape: "索引/導覽型",  dims: [good,  good,  good,  mixed, good]}
+    freeCodeCamp_freeCodeCamp: {shape: "應用/服務",   dims: [good,  mixed, good,  mixed, good]}
+    public-apis_public-apis:  {shape: "awesome/清單", dims: [poor,  n/a,   mixed, mixed, good]}
+    sindresorhus_awesome:     {shape: "awesome/清單", dims: [poor,  n/a,   mixed, poor,  good]}
+    vinta_awesome-python:     {shape: "awesome/清單", dims: [good,  n/a,   good,  mixed, good]}
+  B:
+    httpie_httpie:            {shape: "CLI 工具",     dims: [good,  mixed, good,  mixed, good]}
+    gofiber_fiber:            {shape: "library",      dims: [good,  good,  good,  good,  good]}
+    dbt-labs_dbt-core:        {shape: "CLI 工具",     dims: [good,  mixed, mixed, good,  good]}
+    ai_size-limit:            {shape: "CLI 工具",     dims: [good,  good,  good,  good,  mixed]}
+    amplication_amplication:  {shape: "應用/服務",    dims: [mixed, good,  mixed, good,  good]}
+    choojs_choo:              {shape: "library",      dims: [good,  mixed, good,  mixed, poor]}
+    facebook_react:           {shape: "library",      dims: [good,  good,  good,  good,  good]}
+    torvalds_linux:           {shape: "索引/導覽型",  dims: [good,  good,  good,  mixed, good]}
+    freeCodeCamp_freeCodeCamp: {shape: "索引/導覽型", dims: [good,  good,  good,  mixed, good]}
+    public-apis_public-apis:  {shape: "awesome/清單", dims: [poor,  n/a,   good,  mixed, good]}
+    sindresorhus_awesome:     {shape: "awesome/清單", dims: [poor,  n/a,   mixed, n/a,   mixed]}
+    vinta_awesome-python:     {shape: "awesome/清單", dims: [good,  n/a,   good,  poor,  good]}
+  C:
+    httpie_httpie:            {shape: "CLI 工具",     dims: [good,  mixed, mixed, good,  good]}
+    gofiber_fiber:            {shape: "library",      dims: [good,  good,  good,  good,  good]}
+    dbt-labs_dbt-core:        {shape: "CLI 工具",     dims: [good,  poor,  good,  good,  good]}
+    ai_size-limit:            {shape: "CLI 工具",     dims: [good,  good,  good,  mixed, mixed]}
+    amplication_amplication:  {shape: "應用/服務",    dims: [mixed, good,  mixed, good,  good]}
+    choojs_choo:              {shape: "library",      dims: [good,  mixed, good,  mixed, poor]}
+    facebook_react:           {shape: "library",      dims: [good,  good,  good,  good,  good]}
+    torvalds_linux:           {shape: "索引/導覽型",  dims: [good,  good,  good,  mixed, good]}
+    freeCodeCamp_freeCodeCamp: {shape: "索引/導覽型", dims: [good,  good,  good,  mixed, good]}
+    public-apis_public-apis:  {shape: "awesome/清單", dims: [poor,  n/a,   mixed, mixed, good]}
+    sindresorhus_awesome:     {shape: "awesome/清單", dims: [poor,  n/a,   mixed, mixed, mixed]}
+    vinta_awesome-python:     {shape: "awesome/清單", dims: [good,  n/a,   good,  mixed, good]}

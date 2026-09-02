@@ -82,15 +82,18 @@ python3 readme-reviewer/scripts/lint_readme.py <repo 目錄> --json
 的 packaging 權重來自 97 個 repo 的星數梯度，有 bootstrap CI 可查。**本專案沒有那個東西。**
 
 來源是 **triangulation**：公開規範 + 該專案 54 份質化筆記收斂的寫作工藝樣態。
-**2026-09-02 起三個來源已逐條開啟原文核對並附逐字引用**
-（GitHub Docs ✅ / Standard Readme `spec.md` ✅ / `matiassingers/awesome-readme` ✅）；
-**Make a README 與 Diátaxis 仍未查**，引用它們時只有中等證據強度
-（[查證狀態逐條寫在條文裡](readme-reviewer/references/rubric.yaml)）。
+**六個來源已全數逐條開啟原文核對並附逐字引用**（2026-09-02：GitHub Docs /
+Standard Readme `spec.md` / `matiassingers/awesome-readme` / Make a README / Diátaxis；
+姊妹專案筆記為同作者資料，按非獨立折扣——
+[查證狀態逐條寫在條文裡](readme-reviewer/references/rubric.yaml)）。
+其中 Make a README 的 **Support / Authors / Project status** 段是 R-005 的第三個獨立來源；
+⚠️ Diátaxis **沒有 README 專屬指引**，對本 rubric 的適用是間接推衍。
 
-⚠️ **查證來源不等於驗證權重。** 那三份查證改變的是「我們說某來源講了什麼」的可信度，
-**不改變**上面那句「權重是選的、不是量出來的」。而且查到的三件事**都是反證**：
-規範要求的兩個內容面本 rubric 零維度承載、Standard Readme 的 Title 規則與 H-002 直接矛盾、
-人工策展的收錄理由零次提及 R-004。
+⚠️ **查證來源不等於驗證權重。** 查證改變的是「我們說某來源講了什麼」的可信度，
+**不改變**上面那句「權重是選的、不是量出來的」。首輪查到的三件事**都是反證**
+（兩個內容面零維度承載、Title 規則與 H-002 矛盾、策展理由零次提及 R-004）——
+前兩者已在 0.2.0 的誤判批次處理中修掉，第三者記錄在案；
+Make a README 那輪則查到**支持證據**（R-005 的第三個獨立來源）。兩種都要如實記。
 
 **那為什麼還值得做？** 因為那個專案跑完六個 phase 的結論是
 **「星數關聯的是打包面，不是內容工藝——craft 才是主判」**。

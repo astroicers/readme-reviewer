@@ -97,6 +97,10 @@ jobs:
       - name: Re-simulation numbers match report claims
         run: python scripts/resimulate_18.py
 
+      # 盲判報告的一致度統計同樣由腳本斷言(判讀值在版控、作者值 import 自 resimulate)
+      - name: Blind-judge agreement numbers match report claims
+        run: python scripts/blind_agreement.py
+
   windows:
     runs-on: windows-latest
     name: windows
