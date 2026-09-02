@@ -3,7 +3,7 @@ name: readme-reviewer
 description: 審查任意 GitHub repo 的 **README 寫得好不好**,輸出形狀感知的診斷。Use when 使用者要求 review README、審查專案說明文件、評估 GitHub repo 的 README 品質、問「我的 README 寫得如何/缺什麼」、或要為新專案寫 README 前想知道判準。**主判是 craft 質化判讀(R-001~005:第一屏定位 / 最短可執行路徑 / 寫作品質 / 限制誠實 / 求助與維護),lint 只是先跑的 hygiene 與安全過濾器,其分數不是品質結論。** 輸出三段式:craft verdict + 形狀與缺口 + 分維度 findings。
 license: MIT
 metadata:
-  rubric_version: "0.3.0"
+  rubric_version: "0.4.0"
   evidence: "triangulation(公開規範 + 質化樣態),**非**星數梯度——見 references/rubric.yaml 的證據性質段"
 ---
 
@@ -69,6 +69,7 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
 | **monorepo** | 根 README 只做路由 | 不因根 README 薄扣分；**以子套件 README 抽樣**評分 |
 | **索引/導覽型** | 本體是**指向他處的目錄**（文件路由、讀者分流） | R-002 認「**怎麼開始讀/從哪進入**」；R-003 判**分類與導覽結構**品質（不要求規則因果）；R-004 照常（repo 內相對指向計入機械同步） |
 | **hosted 服務門面** | codebase repo，產品本體是託管服務 | R-002 認**消費路徑**（打開服務）與**貢獻路徑**（本地跑起來）**擇一完整**；兩者皆缺才降 |
+| **文件前門型** | 可建置專案、**正典文件在樹內**、README 刻意做讀者分流（kernel 型） | R-002 認「從哪進入」（repo 內檔案級路由視同達成，見 delegation_stance）；R-003 判**分流與導覽品質**（不要求規則因果）；R-004 照常 |
 | **模板 / starter** | 給人 fork 當起點 | R-002 認「**怎麼用這個模板**」而非「怎麼安裝」 |
 
 **關鍵**：rubric 條款裡本來就有這些例外（`exemption`、`equivalent_forms`、
@@ -77,6 +78,9 @@ python3 scripts/lint_readme.py <目標 repo 目錄> --json
 
 ⚠️ **形狀由 artifact 主體決定，不由 README 內容反推**——「它是什麼」看 repo 裝的是什麼，
 「寫得好不好」才看 README。用 README 薄厚回推形狀會倒果為因（盲判實測抓到的分歧源）。
+**限縮**：禁的是「由 README 薄厚反推品質形狀」；當 repo 主體是程式**且**正典文件在樹內、
+README 明確做讀者分流時，**文件前門型是 artifact 的正確描述**，不是反推
+（盲判 R2 實測：舊寫法把 kernel 型逼進「應用/服務」，R-003 三值全開）。
 
 ### 步驟 4：質化審 craft（**這是你的核心工作，lint 做不到**）
 

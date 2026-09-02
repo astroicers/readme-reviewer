@@ -1,6 +1,6 @@
 {
   "name": "readme-reviewer",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Review any GitHub README for how well it is WRITTEN. The primary judgment is an LLM craft review across five dimensions (R-001~R-005) — first-screen positioning, shortest runnable path, writing quality, honest limits, and support & maintenance; a deterministic lint runs first as a hygiene/security filter and its output is explicitly not a quality verdict. Shape-aware: library, CLI, app, research, awesome list, monorepo and template READMEs get different exemptions. Evidence is triangulation (public specs + qualitative patterns), NOT a star gradient.",
   "author": {
     "name": "astroicers"

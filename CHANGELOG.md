@@ -7,6 +7,29 @@
 
 ## [Unreleased]
 
+(空)
+
+---
+
+## [0.4.0] — 2026-09-02(rubric 0.4.0 / 工具 0.4.0)
+
+**第三次誤判批次:11 條(真實使用 3 + 實驗室 8)→ 11 修 0 不修。**
+觸發者正是裁定等待的真實使用(B1 首批,6 份自有 README:NR 4 / AWN 2,
+見 `reviews/2026-09-02-use-batch-b1.md`);批次全文 `reviews/2026-09-02-misjudgment-batch-3.md`。
+
+- **code**:`github_slug` emoji 標題假陽性(backup-worker 23→0;GitHub 移除
+  emoji 後不 re-trim,我們也不再 strip);**S-001 補 `bash <(curl…)` 行程替換形與
+  PowerShell `irm|iex` 形**(AI-SOP README 0→7 命中);三突變全轉紅
+- **criteria**:形狀表 + **文件前門型**列、artifact 反推禁令限縮(治 kernel 型);
+  R-004 載重統計三裁定(歷史完成式不算/社會證明算/`free` 分商業與否)、
+  **宣稱即陳述合體裁定**、badge 事實整體出 scope(static `/badge/` 是假 badge);
+  R-002 delegation 補應用/索引立場與 library 豁免邊界(旗艦範例缺件不豁免);
+  R-003 連言與清單描述門檻(「抽 10 見 2」是選的);R-005 雙向管道構成 + href 匿名裁定
+- ⚠️ 三處「單一出口」推導有污染(作者讀過盲判值);縫 6 是裁定推翻多數判讀實踐
+  (依機制非投票);依裁定不開實驗室驗證輪,效果由真實使用檢驗
+
+### 本版的觸發脈絡(同日稍早,PR #6/#8)
+
 ### ⭐ 第二輪盲判:rubric 0.3.0 的格級驗證(D/E/F × 同批 12 份)
 
 全文:`reviews/2026-09-02-blind-rejudge-030.md`;統計由 `scripts/blind_agreement_r2.py`

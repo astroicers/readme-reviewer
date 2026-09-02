@@ -65,7 +65,13 @@ SECURITY_RULES = [
 ]
 SECURITY_SEVERITY = {f: s for f, _i, s, _c in SECURITY_RULES}
 
-PIPE_TO_SHELL = re.compile(r"(?i)\b(curl|wget)\b[^\n|]{0,200}\|\s*(sudo\s+)?(ba|z|k)?sh\b")
+PIPE_TO_SHELL = re.compile(
+    # 三種「下載即執行」形(同一 flag,S-001 極性照舊:標示 ≠ 扣分):
+    #   管道形 curl|sh、行程替換形 bash <(curl …)、PowerShell irm … | iex
+    # 後兩形是真實使用 B1 抓到的全盲(AI-SOP README 6 處,security 曾報 0)。
+    r"(?i)(?:\b(?:curl|wget)\b[^\n|]{0,200}\|\s*(?:sudo\s+)?(?:ba|z|k)?sh\b"
+    r"|\b(?:ba|z|k)?sh\s+<\(\s*(?:curl|wget)\b"
+    r"|\b(?:irm|iwr|invoke-restmethod|invoke-webrequest)\b[^\n|]{0,200}\|\s*(?:iex|invoke-expression)\b)")
 # 只認**高熵且帶已知前綴**的樣態。佔位符不算 —— 那是 README 的正常寫法。
 REAL_SECRET = re.compile(
     r"\b(gh[pousr]_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9]{32,}|AKIA[0-9A-Z]{16}\b"
@@ -155,7 +161,10 @@ def github_slug(heading):
     已知近似:emoji 標題的 slug 未實測(語料中無內部 anchor 指向 emoji 標題)。"""
     s = _heading_render_text(heading).strip().lower()
     s = re.sub(r"[^\w\s一-鿿぀-ヿ가-힯-]", "", s)
-    return re.sub(r"\s", "-", s.strip())
+    # ⚠️ 移除字元後**不得再 strip**:emoji 開頭標題(`📖 概述`)移除 emoji 剩前導空白,
+    # GitHub 逐空白轉 `-` 且不 re-trim → 實際 anchor 是 `#-概述`。
+    # 真實使用 B1 實測 23 個假陽性(backup-worker),ground truth=作者抄自 GitHub UI 的 TOC。
+    return re.sub(r"\s", "-", s)
 
 
 def _fence_regions(text):
@@ -518,6 +527,10 @@ def selftest():
     assert PIPE_TO_SHELL.search("curl -fsSL https://x/i.sh | sh")
     assert PIPE_TO_SHELL.search("curl -L https://x | sudo bash")
     assert not PIPE_TO_SHELL.search("curl -o out.sh https://x/i.sh   # 先看再跑")
+    assert PIPE_TO_SHELL.search("bash <(curl -fsSL https://x/install.sh)"), "行程替換形(B1 全盲)"
+    assert PIPE_TO_SHELL.search("irm https://x/install.ps1 | iex"), "PowerShell iex 形(B1 全盲)"
+    assert not PIPE_TO_SHELL.search("bash <(cat local.sh)"), "非下載的行程替換不中"
+    assert not PIPE_TO_SHELL.search("irm https://x/data.json | ConvertFrom-Json"), "irm 非執行不中"
     for u in OBEY_KNOWN_UNCOVERED:
         assert OBEY_REMOTE.search(u), \
             f"夾具沒有觸發語 → `not obey_remote_hits` 會是恆真斷言,測不到消音邏輯:{u}"
@@ -563,7 +576,10 @@ def selftest():
     assert [(l, t) for l, t, _ in dup] == [(1, "A")], dup
 
     # ── slug 與死連結 ───────────────────────────────────────────────────
-    assert github_slug("## 統計限制(必讀)") == "統計限制必讀", github_slug("## 統計限制(必讀)")
+    assert github_slug("統計限制(必讀)") == "統計限制必讀", github_slug("統計限制(必讀)")
+    # emoji 開頭:移除後的前導空白轉 `-`,不 re-trim(B1 實測 ground truth)
+    assert github_slug("📖 概述") == "-概述", github_slug("📖 概述")
+    assert github_slug("🚀 核心特性") == "-核心特性"
     assert github_slug("Getting Started!") == "getting-started"
     # ⚠️ 空白逐個換 `-`,不是折疊 —— 折疊突變會在這三條轉紅(ground truth 是
     # public-apis / awesome-python / choo 寫在 README 裡的真實 anchor)
