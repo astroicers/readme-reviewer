@@ -31,28 +31,13 @@
 
 ## 待處理
 
-**目前 11 條(批次 #3;實驗室 8 + 真實使用 3)——已達批次門檻,B1 落地後即處理** ——
-真實使用的 3 條(B1 批次撈到,全文 `reviews/2026-09-02-use-batch-b1.md`)正是裁定
-等待的觸發事件;既有實驗室列的活化證據亦已累積(R-005 匿名縫 ×5、量詞縫 ×3)。原按語:
-全部來自第二輪盲判(D/E/F × rubric 0.3.0)的 friction 收斂,
-見 [`reviews/2026-09-02-blind-rejudge-030.md`](reviews/2026-09-02-blind-rejudge-030.md)。
-**下一個有權觸發條文修訂的事件是真實審查中的誤判**,不是第三輪實驗室盲判
-(兩輪後整體一致度持平 86.1→87.2、修一縫露一縫,已逼近「再測也解析不出修訂效果」的已知邊界)。
+**目前 0 條** —— 批次 #3 的 11 條(實驗室 8 + 真實使用 3)已於 2026-09-02 處理完畢
+(**11 修 0 不修**),見 [`reviews/2026-09-02-misjudgment-batch-3.md`](reviews/2026-09-02-misjudgment-batch-3.md)。
+⇒ rubric **0.4.0** / 工具 **0.4.0**。批次 #1/#2 見已處理表。
 
 | 日期 | 對象 | 規則 | 它說什麼 | 我認為應該是什麼 |
 |------|------|------|----------|------------------|
-| 2026-09-02 | 盲判R2×3(D#1#2/E#2/F#1#2) | 形狀表 + artifact 禁反推 | 「形狀由 artifact 主體決定」 | **缺「可建置專案、正典文件在樹內、README 是文件前門」列**——kernel 型 repo 撞上禁反推規則,linux 形狀 2:1、R-003 三值全開(poor/good/mixed)。⚠️ 這條規則是批次 #2 為修 fCC 加的:**修一個形狀弄壞另一個,第 N+2 次同型** |
-| 2026-09-02 | 盲判R2×3(D#3/E#5/F#7) | R-004 `scope_of_perishable` 的「載重」 | 「讀者會據以行動或決策的」 | **統計數字無判別法**——歷史完成式(54k 星)、社會證明(100k people、#10 most-starred)、`free` 零元定價,三位各自立法。E#13 併記:**序 2 對「一個裸宣稱」與「滿篇裸宣稱」不分級,是本條最粗的刻度** |
-| 2026-09-02 | 盲判R2×2(D#4/E#6) | R-004 「宣稱即陳述」 | statement_test 與裸露計費可同時命中同一句 | 「tested with Go 1.25+」一句既過 statement_test 又是裸露版本宣稱——放行或計費無裁決,fiber R-004 從 R1 的一致 good 被新量詞打成 **2:1**(預登記唯一未中格)。**修法讓邊界更嚴謹的同時製造了新分歧點** |
-| 2026-09-02 | 盲判R2(F#4+D/E 行為分裂) | R-004 badge-only 易腐 | scope 說 badge 不在判定範圍;equivalent_forms 說自動 badge 是機械同步 | **兩節條文互指反方向**(批次 #2 同時寫的,當時沒發現)——httpie 序3 mixed(D/F)vs 序4 n/a(E)。要嘛 badge 完全出場(序4),要嘛明入 scope 且序3 承接 |
-| 2026-09-02 | 盲判R2×2(D#2/F#1) | R-002 `delegation_stance` | 只為 CLI/library/hosted 立場 | **應用/服務與索引型沒有立場**——linux 與 dbt 同型(零指令+委外)得 mixed/poor 兩值,差異全來自形狀格不來自工藝 |
-| 2026-09-02 | 盲判R2(E#1 明文;D good/E good/F mixed) | R-002 library 豁免 vs mapping 示例 | 豁免「npm install 之缺」;mapping 點名「照貼缺件」傷基礎 | **choo 旗艦例 require 未列裝的套件**恰落兩條文交集——豁免涵不涵蓋「缺口讓旗艦例貼了就壞」要明說;F#6 併記:同型瑕疵在最短路徑上/外是否同罪 |
-| 2026-09-02 | 盲判R2×2(E#9#10/F#3,承 R1) | R-003 基礎連言 + 清單描述門檻 | 「附理由;有例子」分號並列 | **半達成落哪格無裁決線**(httpie 例強理由薄);清單描述缺席率(sindre 機械計數 30%)無門檻——R-003 是本輪唯一下滑維度(83.3→75.0),縫在這與 linux 形狀 |
-| 2026-09-02 | 盲判R2×2(D#9/F#8) | R-005 求助管道最低構成 | 主體有六種正形式,管道只有反例 | **contributing guide / 廣播型 Twitter 算不算「去哪問」無定義**——sindre R-005 2:1;F#8 併記:主體名只活在 href、散文匿名時算哪邊。單源併記:E#8(序4/序5 同值)、D#6(陳述須在 README 內?)、D#5(驗證方式的外部排除範圍)、F#9(章節級陳述涵蓋範圍)、E#4(序2 vs 序4 誘因怪象)。⚠️ **2026-09-02 真實使用 #1 重現本縫**(skill-quality-research README:純「我們」組織聲音+散文零具名,照條文 good 但讀者答不出「我們是誰」——與 sindre 格同縫反向,見 `reviews/2026-09-02-use-skill-quality-research.md`) |
-| 2026-09-02 | 真實使用 B1(backup-worker) | `github_slug` emoji 標題 | 23 個 anchor 死鏈全假陽性 | **條文自記的「emoji slug 未實測」已知近似被真實語料否證**:`## 📖 概述` → GitHub 移除 emoji 後**前導空白轉 hyphen、不 trim** → 實際 anchor `#-概述`;我們 `strip()` 後算 `概述`。ground truth = 作者從 GitHub UI 抄的 TOC(與 public-apis 案同型)。修法:slug 流程去掉 strip(或改為只去尾)並補夾具 |
-| 2026-09-02 | 真實使用 B1(AI-SOP-Protocol) | S-001 `PIPE_TO_SHELL` | README 有 `bash <(curl …)` ×4 與 `irm … \| iex` ×2,security 報 **0** | **兩種下載執行形全盲**:regex 只認管道形。實測三句對照:管道形命中、行程替換與 PowerShell iex 皆 False。修法:補 `<\(\s*curl|wget` 行程替換分支與 `irm/iwr … \| iex` 分支,極性照 S-001 慣例(標示≠扣分) |
-| 2026-09-02 | 真實使用 B1(backup-worker) | R-004 `equivalent_forms` 的「自動更新 badge」 | `Tests-52/52` static shields 被誤導性計入同步 | **寫死數字扮成 badge**:`img.shields.io/badge/...` 是靜態圖,不是服務端渲染;現行措辭會讓判讀者把假 badge 計為機械同步。修法:補「動態 badge(值由服務端渲染)才算;`/badge/` 路徑的 static shields 是裸宣稱」判別字 |
-
+|（空）| | | | |
 
 ## 待測(儀器目前做不到,**不佔處理額度**)
 
@@ -67,6 +52,7 @@
 
 | 日期 | 對象 | 規則 | 處置 |
 |------|------|------|------|
+| 2026-09-02 | **批次 #3(11 條:實驗室縫 8 + 真實使用 3)** | 見 [`reviews/2026-09-02-misjudgment-batch-3.md`](reviews/2026-09-02-misjudgment-batch-3.md) | **11 修 0 不修**,rubric 0.3.0→0.4.0、工具 0.3.0→0.4.0。code:emoji slug 不再 strip(23→0)、S-001 補行程替換與 irm\|iex 兩形(AI-SOP 0→7)、static 假 badge 出 scope。criteria:文件前門型列+artifact 限縮、載重統計三裁定、宣稱即陳述合體裁定、badge 出 scope、應用/索引 delegation、旗艦範例缺件不豁免(裁定推翻多數實踐,依機制)、R-003 連言與清單門檻、R-005 雙向管道+href 匿名。3 突變轉紅;縫 3/4/5 單一出口推導有污染,驗證等真實使用 |
 | 2026-09-02 | **批次 #2(10 條:盲判收斂 9 + verbatim 補登 1「主體指認邊界」A#7/B#6)** | 見 [`reviews/2026-09-02-misjudgment-batch-2.md`](reviews/2026-09-02-misjudgment-batch-2.md) | **9 修 / 1 刻意不修**,rubric 0.2.0→0.3.0、工具 0.2.0→0.3.0(純條文,零程式行為變更)。修:R-004 `scope_of_perishable`(載重宣稱;範例 pin/修辭形容/外部連結本體不算)+ `statement_test`(排除力判別法;清單型認收錄立場)+ 序 1 空缺連言明定 + 序號必記;R-005 anti-pattern 專屬格位(序 2 → mixed)+ 世界知識具名規則 + 主體指認三形式;craft_value_mapping 瑕疵位置;R-002 `delegation_stance`(CLI 外鏈不豁免/library 豁免安裝/hosted 擇一);形狀表 + hosted 服務門面列 + 「形狀由 artifact 決定」;R-001 渲染近似規則。刻意不修:**R-004 序 3 封頂 mixed**(B#3 反直覺成立,但機械同步只解決鮮度、不回答「何時不該用」——rationale 已寫進條文一行)。rollup 門檻不動 |
 | 2026-09-02 | **批次 #1(12 條)** | 見 [`reviews/2026-09-02-misjudgment-batch-1.md`](reviews/2026-09-02-misjudgment-batch-1.md) | **8 修 / 2 刻意不修 / 2 記分歧**,rubric 0.1.0→0.2.0、工具 0.1.0→0.2.0。修:H-002 撤 bare-name 扣分降 info;R-004 三出口→五出口(+機械同步 equivalent_forms);craft_value_mapping;形狀表+索引/導覽型;HEADING_RE 三語法+fence 遮罩;slug 逐空白;HTML 具名錨;H-005 前提文件化+稀疏 root 警示;**R-005 新增**(缺席不設 poor;內部工具 n/a)。刻意不修:H-004(抽查 6/6 輸出型,info 級);rollup `≥2 mixed` 門檻(重模擬無調整依據)。分歧:本 repo README 的 blockquote 定位句與 Standard Readme 相左,已於 README 註明。18 份重模擬:needs-revision 11→10、R-004 poor 10→7,數字由 `scripts/resimulate_18.py` 斷言並掛 CI。9/9 突變轉紅 |
 | 2026-09-02 | 本 repo(流程) | commit 訊息宣稱了沒發生的事 | **已公開更正。** `08e9e01` 的訊息寫「README 的信任度表與 CHANGELOG 同步更新」,而 **README 一個字都沒動** —— 批次改檔的腳本在 README 那一段 `assert` 失敗、整段中止,但我**沒有檢查 `git show --stat` 就 commit 並 push**。成因是 anchor 用半形逗號而檔案是全形。⚠️ **這是本 repo 到目前為止最嚴重的一次**:前面幾條是程式與註解不符,這一條是**commit 訊息與 diff 不符,而且已經推出去了**。⇒ 教訓:**批次改多檔的腳本失敗時會靜默留下半套**,commit 前一律看 `--stat` 對照訊息宣稱的檔案清單 |
