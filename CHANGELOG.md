@@ -61,6 +61,24 @@
 ⇒ 已補上 stdout/stderr 的 `reconfigure(encoding="utf-8")`。
 本機用 `PYTHONIOENCODING=cp1252` 重現:**修前 rc=1、修後 rc=0**。
 
+### 首批 craft 判讀(2026-09-02):判準會說「不」,但成因集中
+
+**主判的第一次實測。** 6 份真實 README,23 個已判維度標記:good 15 / mixed 5 / poor 3。
+verdict:**approved 2 / approved-with-notes 1 / needs-revision 3(50%)**。
+
+⇒ **姊妹專案 41/41 那個失敗模式沒有重演。** `mixed` 從第一天計費的設計在第一批就產生輸出。
+
+⚠️ **但 3 個 `poor` 全部出自 R-004,沒有一個來自其他三維** ——
+而條文裡本來就寫著「本條若過度觸發,先懷疑它,不要先調 rollup 門檻」。**第一批就撞上了。**
+
+⚠️ **判讀者是我,而我寫了 rubric**,且我知道 41/41 的教訓 —— **有動機讓它開火**。
+全文與污染聲明見 `reviews/2026-09-02-first-craft-batch.md`。
+**本批只證明了這條路徑會輸出 needs-revision,沒有證明它判得準。**
+
+判讀過程撞到三個條文缺口,全部入 misjudgments(現 5 條,已達批次下緣):
+`pass_criteria` 沒映射到取值域、形狀表缺「索引/導覽型」、
+R-004 的 `decision_order` 看不到「機械同步」這種驗證形式。
+
 ### 第三次 CI 紅燈:寫者側修好不等於讀者側也好了
 
 `UnicodeDecodeError`(decode,不是 encode)。`subprocess.run(text=True)` 在 Windows
