@@ -25,6 +25,21 @@ jobs:
           test "$a" = "$b" || { echo "❌ 版本不同步（$a vs $b）"; exit 1; }
           echo "✅ plugin/marketplace 版本同步：$a"
 
+      # 複審 F-04:0.2.0 曾只 bump 版本、描述仍寫 four dimensions——描述也要跟維度數同源
+      - name: Plugin descriptions reference the current dimension set
+        run: |
+          python3 - <<'EOF'
+          import json, sys
+          sys.path.insert(0, "readme-reviewer/scripts")
+          from lint_readme import CRAFT_DIMS
+          tag = f"R-001~{CRAFT_DIMS[-1]}"
+          for f, get in [(".claude-plugin/plugin.json", lambda d: d["description"]),
+                         (".claude-plugin/marketplace.json", lambda d: d["plugins"][0]["description"])]:
+              desc = get(json.load(open(f, encoding="utf-8")))
+              assert tag in desc, f"{f}: 描述未引用現行維度集 {tag}——維度數動了描述沒跟上"
+          print(f"✅ 兩份描述都引用 {tag}")
+          EOF
+
       - name: rubric_version present and referenced by SKILL.md
         run: |
           v=$(grep -m1 '^rubric_version:' readme-reviewer/references/rubric.yaml | tr -d '"' | awk '{print $2}')

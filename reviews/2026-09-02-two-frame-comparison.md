@@ -285,8 +285,10 @@ Standard Readme 獨立佐證同兩項(Contributing 要求 "State where users can
 Maintainers 要求 "along with one way of contacting them")。
 
 **兩個獨立來源都要求、而本 rubric 一個維度都沒有** —— 這是目前證據最強的一條缺口。
-順帶:本批 12 份裡有 **11 份**寫了求助管道(唯一沒寫的是 `sindresorhus/awesome`),
-**判準對此完全看不見**。
+順帶:本批 12 份裡有 **10 份**寫了可指認的求問管道
+(沒寫的是 `sindresorhus/awesome` 與 `ai/size-limit`),**判準對此完全看不見**。
+(⚠️ 原版寫 11 份且稱 awesome 是唯一——size-limit 也沒有,批次處理的獨立複審
+F-07 抓到後更正;它指向 estimo 的 issue 連結是別的 repo 的,不算自己的求助管道。)
 
 ---
 
@@ -295,7 +297,7 @@ Maintainers 要求 "along with one way of contacting them")。
 - **沒有修任何一條**,包括三個已用實測確認的程式缺陷(setext/HTML 標題、slug 折疊、HTML 具名錨)。
   紀律是累積後**一次**處理;而**在量測的同一輪修判準會污染下一輪量測**
   (姊妹專案 `docs/llm-judge-contamination.md` §3 的具名教訓)。
-  ⇒ 待處理現已 **10 條,達批次門檻上緣,下一個動作就是批次處理**。
+  ⇒ 待處理達批次門檻上緣,下一個動作就是批次處理。(⚠️ 原版寫「現已 10 條」,實際登記完成後是 **12 條**——`misjudgments.md` 與 CHANGELOG 記 6→12 為準;複審 F-15 抓到三處不一致,以此更正。)
 - **沒有挑掉 B 框的清單型**讓它「看起來公平」——那會把抽樣框改成不是它自己。
 - **沒有宣稱兩框比較有統計意義**。
 - **沒有用「A 框是策展的所以比較好」來解釋差異** ——資料顯示差異更可能來自形狀。

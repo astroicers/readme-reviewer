@@ -28,16 +28,29 @@
 
 ## §1 H-002:撤銷「H1 等於 repo 名」的扣分
 
-兩條獨立證據,方向一致:
+> ⚠️ **本節第一版的第 2 條證據是錯的,獨立複審(F-01/F-02)抓到後更正如下。**
+> 原版寫「未過與 R-001 poor 零交集;5 個 logo 型未過者 R-001 全是 good」——
+> 重算後**交集是 1 不是 0**(`sindresorhus/awesome`:H-002 未過且 R-001 poor),
+> 「全是 good」也不成立(`fiber` 是 mixed)。**而且那 7 次未過全是「無文字 H1」支——
+> bare-name 支在該批零次觸發**(抽樣目錄名帶前綴),拿它支持撤銷 bare-name 扣分
+> 正是雙抽樣框報告自己警告過的「混為一談會讓證據說謊」。我又犯了一次。
 
-1. **規範矛盾**:Standard Readme spec 明文 "Title must match repository, folder and
-   package manager names" —— 舊版扣的正是規範要求的形狀,**與自己引用的來源打架**。
-2. **實測零重疊**:12 份真實 README 中 H-002 未過 7 次,與 R-001 poor(2 次)**零交集**;
-   5 個 logo 型未過者的 R-001 全是 good。⇒ H-002 的「定位」訊號在真實語料上**全是假陽性**,
-   定位判斷 R-001 完全接得住(misjudgment 條目要求先確認這點,已確認)。
+更正後的證據結構,**兩支分開講**:
+
+- **bare-name 支(撤銷扣分的對象)**:證據是 (a) **規範矛盾** —— Standard Readme spec
+  明文 "Title must match repository, folder and package manager names",舊版扣的正是
+  規範要求的形狀,與自己引用的來源打架;(b) Phase 6 的 n=15 語料中 bare-name 支確實開火
+  (含本 repo 自身,而其定位句就在 H1 下一行,運作良好)。**沒有 12 份批次的統計支持
+  ——那批打不到這一支。**
+- **no-text-H1 支(保留回報、severity 降 info 的對象)**:12 份中未過 7 次,
+  其中 6 次的 R-001 是 good/mixed(定位由 logo+tagline 承載,R-001 判得出來);
+  唯一的 R-001 poor(`awesome`)成因是**廣告佔屏**,與 H1 形式無關。
+  ⇒ 把 H-002 當定位訊號會誤標大多數定位良好的 README;它的價值是結構事實回報。
 
 修法:pass = 有文字 H1(ATX/setext/HTML 皆認);「與 repo 名相同」降為事實回報;
 severity warning → info。**「無文字 H1」仍回報**——logo 型是已文件化的 LLM 複核項。
+⚠️ 語義半邊(bare-name 不扣分)第一版**零守衛**(複審 F-03)——四個 fixture 沒有一個
+H1 等於目錄名,把 pass 邏輯改回扣分版全綠。已補 bare-name 夾具斷言 + 突變。
 
 ## §2 H-004:查證後刻意不修
 
@@ -70,16 +83,25 @@ info 級不進 verdict。⇒ 門檻與 severity 都不動,rubric 補 known_false
 ## §4 三個程式缺陷的修法與實測
 
 全部見 `readme-reviewer/scripts/lint_readme.py` 與其 selftest 新增斷言。
-**9 個突變逐個打過,9/9 轉紅,復原後全綠**(⚠️ 自跑突變只涵蓋自己想得到的形狀,
-獨立複審仍是 land 前的必要步驟):
+第一輪 **9 個突變 9/9 轉紅**;獨立複審(見 §8)點名 5 個未涵蓋的邊界後,
+守衛與突變清單擴充到 **17 個,17/17 轉紅、復原後全綠**。
+(⚠️ 自跑突變只涵蓋自己想得到的形狀 —— 第一輪的 9/9 就漏了複審找到的那 5 類,
+而且擴充時**又**抓到一個沒有鑑別力的夾具,見 §8。)
 
 ```
-🔴 1 slug 退回折疊空白          🔴 6 拿掉具名錨
-🔴 2 拿掉 setext 支援           🔴 7 rubric H-002 severity 改回 warning(drift)
-🔴 3 拿掉 HTML 標題             🔴 8 rubric 的 R-005 改名(維度鍵 drift)
-🔴 4 拿掉 fence 遮罩            🔴 9 evals 案例掉一維(鍵打錯)
-🔴 5 拿掉 frontmatter 剝除
+🔴 01 slug 退回折疊空白         🔴 10 H-002 pass 改回 bare-name 扣分(F-03)
+🔴 02 拿掉 setext 支援          🔴 11 拿掉表格列排除分支(F-13)
+🔴 03 拿掉 HTML 標題            🔴 12 拿掉底線消耗重設(F-14)
+🔴 04 拿掉 fence 遮罩(標題)    🔴 13 未閉合尾塊不遮罩(F-10)
+🔴 05 拿掉 frontmatter 剝除     🔴 14 閉合不查長度(F-10 巢狀)
+🔴 06 拿掉具名錨                🔴 15 anchor 收自未遮罩原文(F-09)
+🔴 07 rubric H-002 severity     🔴 16 BOM 不剝(F-11)
+🔴 08 rubric R-005 鍵 drift     🔴 17 frontmatter 不查 YAML 形狀(F-12)
+🔴 09 evals 案例掉一維
 ```
+
+每個突變的**紅燈原文**(第一行 AssertionError)已錄於 §8 附錄——
+複審的「待補證據 1」指出第一輪只交了修復後的綠燈,沒交紅燈證據,這裡補上。
 
 **修後對 12 份語料重跑**:
 
@@ -97,8 +119,11 @@ info 級不進 verdict。⇒ 門檻與 severity 都不動,rubric 補 known_false
 
 **依據**(皆 2026-09-02 逐字查證):GitHub Docs 五項內容的第 4、5 項
 + Standard Readme 的 Contributing("State where users can ask questions")與
-Maintainers 條款獨立佐證。實測 12 份有 11 份寫了求助管道——讀者面的真實慣例,
-判準此前完全看不見。
+Maintainers 條款獨立佐證。實測 12 份有 **10 份**寫了可指認的求問管道——
+讀者面的真實慣例,判準此前完全看不見。
+(⚠️ 第一版寫 11 份,複審 F-07 抓到與本批自己的 R-005 判讀矛盾:`ai/size-limit`
+與 `sindresorhus/awesome` 都沒有 —— size-limit 連 Contributing 段都沒有,
+指向 estimo 的 issue 連結是**別的 repo** 的;已重數更正。)
 
 **設計上刻意避開 R-004 踩過的坑**:
 
@@ -157,3 +182,89 @@ Maintainers 條款獨立佐證。實測 12 份有 11 份寫了求助管道——
    「會開火」升級成「判得準」的動作(現在條文有了取值映射,信度測試才有意義)
 2. R-005 累積跨批次觸發率紀錄(evidence_note 已標:首兩批重模擬不算)
 3. 查證剩餘兩個 triangulation 來源(Make a README、Diátaxis)
+
+
+---
+
+## §8 獨立複審回合(reality-checker,NEEDS_WORK → 修正)
+
+依 land 政策,本批(實質邏輯改動)於 merge 前派**獨立唯讀 reviewer**
+(工具白名單 Read/Grep/Glob,證據由呼叫端先落檔)。
+判定 **NEEDS_WORK(正面 9 / 反面 12,另 5 項既有/低度)** —— 這是它該有的樣子:
+第一輪自跑的 9/9 突變全綠**不構成證據**,只有讓別人來打它才算。
+
+### 它抓到的,按嚴重度
+
+| # | 發現 | 處置 |
+|---|------|------|
+| F-01 | **§1 的「零重疊」統計被本 PR 自己的資料表推翻**(交集=1:`sindresorhus/awesome`;「全 good」也偽:`fiber` 是 mixed) | ✅ 重算並改寫 §1,三處複本(CHANGELOG、lint 模組註解)同步更正 |
+| F-02 | **該統計整個屬於另一支**(那 7 次未過全是 no-text 支;bare-name 支該批零觸發)——雙抽樣框報告自己警告過「混為一談會讓證據說謊」,我又犯一次 | ✅ §1 改為兩支分開舉證;bare-name 支承認只有 spec 矛盾 + n=15 語料 |
+| F-03 | H-002 語義半邊(bare-name 不扣分)**零守衛**——改回扣分版全綠 | ✅ 補 bare-name 夾具斷言 + 突變 10 |
+| F-04 | R-005 鏈斷在 plugin/marketplace 描述(仍寫 four dimensions,本 commit 只動了版本號) | ✅ 兩份描述改五維;CI 新增守衛(描述必須引用 `R-001~{CRAFT_DIMS[-1]}`) |
+| F-05 | evals 案例名寫「四維俱全」、斷言驗五維 | ✅ 文案對齊 |
+| F-06 | awesome-list fixture 的 R-005=good 不被內容支撐(「收錄建議開 issue」≠ 求問管道,同批對同形狀的 awesome 判 mixed 的理由正是這個),且該值承重(改 mixed 會翻 verdict) | ✅ fixture 補真正的求問管道(Discussions),good 有了支撐 |
+| F-07 | 「11 份寫了求助管道」與本批自己對 size-limit 的判讀矛盾 | ✅ 重數為 **10 份**,三處同步更正 |
+| F-08 | rubric 兩處「本輪不修」狀態句已與本版事實相反;三處統計理由段仍在條文內 | ✅ 狀態句更新、統計外移到本報告 |
+| F-09 | own-anchor 收自**未遮罩**原文、連結掃遮罩文本——fence 裡示範用的 `<a name=>` 會讓真死鏈靜默變合法 | ✅ 兩邊同吃遮罩文本 + 斷言 + 突變 15 |
+| F-10 | `mask_fences` 對**未閉合 fence 不遮罩尾段**(正是本批要修的 amplication 形狀);巢狀 ```` 被 ``` 提早關閉 | ✅ `_fence_regions` 統一配對(CommonMark:同字元且長度≥開頭;未閉合延伸到檔尾)+ 斷言 + 突變 13/14 |
+| F-11 | UTF-8 BOM 同時打壞 ATX 第一行與 frontmatter 判定 | ✅ `read_text` 改 `utf-8-sig` + 斷言 + 突變 16 |
+| F-12 | `_strip_frontmatter` 對「`---` 開場但不是 frontmatter」整段塗白——與本批要修的根因同型 | ✅ 補 YAML 形狀檢查(每個非空行須是 key:/註解/縮排)+ 斷言 + 突變 17 |
+| F-13/F-14 | 兩個「名字宣稱驗 A、實際驗 B / 無鑑別力」夾具(表格列夾具打不到排除分支;連續底線夾具有無重設結果相同) | ✅ 換成有鑑別力的形狀(`\| a \| b \|\n---` 與 `A\n===\n===`)+ 突變 11/12 |
+| F-15 | 待處理條數三處不一致(10/12/6→12) | ✅ two-frame 報告可見更正為 12 |
+| F-16 | `fence_stats` docstring 宣稱「單獨 fence 不計」而程式照計(既有) | ✅ 與 `mask_fences` 共用 `_fence_regions`,docstring 照實寫 |
+| F-17 | H-004 門檻守衛硬編字面 `70%`,沒綁常數(單向失效) | ✅ 綁 `FENCE_LANG_MIN_PCT` |
+| F-18 | 重複註解兩行 | ✅ 去重 |
+
+**兩個不修**:`24kchengYe` 的 R-003 佔位(它已確認不影響任何被斷言的數字,
+resimulate 內已註明);`read_text` 對 OSError 靜默回空(複審列為觀察,
+行為與「找不到 README」合流是既定設計——H-001 的 detail 已能區分路徑存在與否)。
+
+### ⭐ 擴充突變時又抓到一個沒鑑別力的夾具
+
+F-12 的第一版夾具把真標題放在第二條 `---` **之後**——塗白與否結果相同,
+突變 17 因此存活。**這是同一天內第三次撞見「夾具打不到它宣稱的分支」**
+(F-13、F-14、這裡),形態與 0.1.0 那個 F1 回歸夾具完全相同。
+⇒ 夾具的鑑別力要件:**受測內容必須落在會被突變改變的區域裡**。已換夾具,17/17 轉紅。
+
+### 突變紅燈原文(待補證據 1 的補件)
+
+```
+🔴 01 slug 退回折疊空白
+     ↳ assert github_slug("Art & Design") == "art--design", github_slug("Art & Design")
+🔴 02 拿掉 setext 支援
+     ↳ assert [(l, t) for l, t, _ in hs] == [(1, "Linux kernel"), (2, "Quick Start")], hs
+🔴 03 拿掉 HTML 標題
+     ↳ assert extract_headings("<h1 align='center'>Choo</h1>")[0][:2] == (1, "Choo")
+🔴 04 拿掉 fence 遮罩(標題)
+     ↳ assert not extract_headings("```bash\n# 這是註解不是標題\n```\n"), \
+🔴 05 拿掉 frontmatter 剝除
+     ↳ assert extract_headings("---\ntitle: x\n---\n# T\n")[0][:2] == (1, "T"), \
+🔴 06 拿掉具名錨
+     ↳ assert sorted(bad) == ["#ghost_anchor", "#nope", "docs/nope.md"], \
+🔴 07 rubric H-002 severity drift
+     ↳ assert hyg[hid].get("severity") == hsev, \
+🔴 08 rubric R-005 鍵 drift
+     ↳ assert craft_ids == set(CRAFT_DIMS), \
+🔴 09 evals 案例掉一維
+     ↳ ✗ rollup 與 evals 逐案對帳: good-readme: craft_dimensions 必須五維俱全,缺 ['R-005'] 多 ['R-005-gone']
+🔴 10 H-002 pass 改回 bare-name 扣分(F-03)
+     ↳ assert nh2["pass"] is True, "H1 等於 repo 名不得扣分(Standard Readme Title 規則)"
+🔴 11 拿掉表格列排除分支(F-13)
+     ↳ assert not extract_headings("| a | b |\n---\n"), "表格列後的裸 --- 不是 setext"
+🔴 12 拿掉底線消耗重設(F-14)
+     ↳ assert [(l, t) for l, t, _ in dup] == [(1, "A")], dup
+🔴 13 未閉合尾塊不遮罩(F-10)
+     ↳ assert not extract_headings("```bash\n# 未閉合 fence 的註解也不是標題\n"), \
+🔴 14 閉合不查長度(F-10 巢狀)
+     ↳ assert not extract_headings("````md\n```\n# 巢狀範例裡的假標題\n```\n````\n"), \
+🔴 15 anchor 收自未遮罩原文(F-09)
+     ↳ assert sorted(bad) == ["#ghost_anchor", "#nope", "docs/nope.md"], \
+🔴 16 BOM 不剝(F-11)
+     ↳ assert analyze(os.path.dirname(bp))["h1"] == "BomTitle", \
+🟢 未轉紅! 17 frontmatter 不查 YAML 形狀(F-12)
+
+16/17 轉紅
+🔴(換夾具後) 17 frontmatter 不查 YAML 形狀(F-12)
+     ↳ AssertionError: 以分隔線開場的 README 不是 frontmatter,不得整段塗白(複審 F-12):[]
+✅ 17/17 轉紅;復原後綠
+```

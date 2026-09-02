@@ -49,9 +49,9 @@ CRAFT_VERDICT_VALUES = ("approved", "approved-with-notes", "needs-revision")
 # ── hygiene 的門檻常數(rubric 是 canonical,這裡是可執行鏡像)────────────────
 FENCE_LANG_MIN_PCT = 70.0        # H-004:code fence 標語言的最低比例
 # severity 提到模組層,selftest 的 drift-guard 逐條與 rubric 對帳(ADR-031:
-# 同一意義兩處編碼必 drift)。H-002 是 2026-09-02 批次處理降的 info:
-# 12 份真實 README 實測,它的未過與 R-001 的 poor **零重疊** ——
-# 它提供的「定位」訊號全是假陽性,只剩事實回報的價值。
+# 同一意義兩處編碼必 drift)。H-002 是 2026-09-02 批次處理降的 info,
+# 理由與實測見批次處理報告(⚠️ 該報告第一版的「零重疊」統計是錯的,
+# 獨立複審抓到後已更正 —— 以報告的更正版為準,不要抄舊說法)。
 HYGIENE_SEVERITY = {"H-001": "error", "H-002": "info", "H-003": "warning",
                     "H-004": "info", "H-005": "warning"}
 
@@ -114,8 +114,10 @@ SECTION_KEYWORDS = re.compile(
 
 
 def read_text(p):
+    # utf-8-sig:UTF-8 BOM 若留在第 0 字元,HEADING_RE 的 `^#` 與
+    # `_strip_frontmatter` 的 startswith 都會在第一行失配(複審 F-11)。
     try:
-        with open(p, encoding="utf-8", errors="replace") as f:
+        with open(p, encoding="utf-8-sig", errors="replace") as f:
             return f.read(MAX_READ)
     except OSError:
         return ""
@@ -156,38 +158,56 @@ def github_slug(heading):
     return re.sub(r"\s", "-", s.strip())
 
 
-def mask_fences(text):
-    """把 fenced code 區塊換成等長空白(保留換行與偏移)。
+def _fence_regions(text):
+    """成對(或未閉合)fence 的 (內文起, 內文迄, info)。
 
-    標題/連結抽取要在遮罩後的文本上做 —— amplication 的 ```shell 區塊裡
+    閉合規則照 CommonMark:同字元且**長度 ≥ 開頭**(```` 內的 ``` 不會提早關閉外層)。
+    未閉合的尾塊視為**延伸到檔尾** —— GitHub 同樣把其餘內容當程式碼渲染;
+    第一版沒處理這個,未閉合 fence 裡的 `# comment` 仍會冒充 H1(複審 F-10)。"""
+    open_m = None
+    for m in FENCE_RE.finditer(text):
+        if open_m is None:
+            open_m = m
+        elif m.group(2)[0] == open_m.group(2)[0] and len(m.group(2)) >= len(open_m.group(2)):
+            yield open_m.end(), m.start(), open_m.group(3).strip()
+            open_m = None
+    if open_m is not None:
+        yield open_m.end(), len(text), open_m.group(3).strip()
+
+
+def mask_fences(text):
+    """把 fenced code 區塊(含未閉合尾塊)換成等長空白,保留換行與偏移。
+
+    標題/連結/anchor 抽取要在遮罩後的文本上做 —— amplication 的 ```shell 區塊裡
     `# running the server component` 曾被當成 H1,讓 H-002 **因錯誤的理由通過**。
     security regex 則刻意掃**原文**(指令本來就住在 fence 裡)。"""
     out = []
     last = 0
-    open_marker = None
-    open_end = None
-    for m in FENCE_RE.finditer(text):
-        marker = m.group(2)
-        if open_marker is None:
-            open_marker = marker[0]
-            open_end = m.end()
-        elif marker[0] == open_marker:
-            out.append(text[last:open_end])
-            body = text[open_end:m.start()]
-            out.append("".join(c if c == "\n" else " " for c in body))
-            last = m.start()
-            open_marker = None
+    for start, end, _info in _fence_regions(text):
+        out.append(text[last:start])
+        out.append("".join(c if c == "\n" else " " for c in text[start:end]))
+        last = end
     out.append(text[last:])
     return "".join(out)
 
 
 def _strip_frontmatter(text):
-    """開頭的 YAML frontmatter 換成等長空白(closing `---` 會被誤認成 setext 底線)。"""
+    """開頭的 YAML frontmatter 換成等長空白(closing `---` 會被誤認成 setext 底線)。
+
+    ⚠️ 只有**長得像 YAML** 的區塊才剝:每個非空行須是 `key:`、註解或縮排續行。
+    第一版只看「以 `---` 開頭」——以分隔線開場、文中另有 `---` 的 README
+    會被整段塗白,真標題跟著消失(複審 F-12,與本批要修的根因同型)。"""
     if not text.startswith("---\n"):
         return text
     m = re.search(r"\n(---|\.\.\.)[ \t]*\n", text[4:])
     if not m:
         return text
+    body = text[4:4 + m.start() + 1]
+    for ln in body.splitlines():
+        if not ln.strip() or ln.lstrip().startswith("#") or ln[:1] in (" ", "\t"):
+            continue
+        if not re.match(r"[\w\"'.-]+[ \t]*:", ln):
+            return text
     end = 4 + m.end()
     return "".join(c if c == "\n" else " " for c in text[:end]) + text[end:]
 
@@ -223,18 +243,16 @@ def extract_headings(text):
 
 
 def fence_stats(text):
-    """(區塊數, 帶語言標註數)。只算成對的開合,單獨一個 fence 不計。"""
+    """(區塊數, 帶語言標註數)。
+
+    與 mask_fences 共用 `_fence_regions` 的配對規則(複審 F-16:第一版兩處
+    配對邏輯不一致,且 docstring 宣稱「單獨一個 fence 不計」而程式照計 ——
+    實際行為是**未閉合的尾塊也算一塊**,與 GitHub 渲染一致,docstring 改為照實寫)。"""
     total = tagged = 0
-    open_marker = None
-    for m in FENCE_RE.finditer(text):
-        marker, info = m.group(2), m.group(3).strip()
-        if open_marker is None:
-            open_marker = marker[0]
-            total += 1
-            if info:
-                tagged += 1
-        elif marker[0] == open_marker:
-            open_marker = None
+    for _s, _e, info in _fence_regions(text):
+        total += 1
+        if info:
+            tagged += 1
     return total, tagged
 
 
@@ -242,11 +260,14 @@ def broken_links(text, root, readme_rel):
     """相對連結與同檔 anchor 的死連結。**不驗 http**(需要網路且會偽陰性)。
 
     ⚠️ 前提:`root` 是**完整的 repo**。只餵一個 README 檔時相對路徑全滅,
-    那是抽樣假陽性不是死鏈(2026-09-02 實測踩過:16 個命中全部無效)。"""
+    那是抽樣假陽性不是死鏈(2026-09-02 實測踩過)。"""
+    masked = mask_fences(text)
     own = {github_slug(h) for _lvl, h, _p in extract_headings(text)}
-    own |= {a.lower() for a in ANCHOR_ATTR_RE.findall(text)}   # <a name=> / id=
+    # anchor 目標與連結掃描吃**同一份遮罩文本**(複審 F-09:第一版 anchor 收自
+    # 原文,fence 裡示範用的 <a name=> 會讓真死鏈靜默變合法)。
+    own |= {a.lower() for a in ANCHOR_ATTR_RE.findall(masked)}   # <a name=> / id=
     bad = []
-    for m in LINK_RE.finditer(mask_fences(text)):
+    for m in LINK_RE.finditer(masked):
         tgt = m.group(2)
         if tgt.startswith(("http://", "https://", "mailto:")):
             continue
@@ -410,7 +431,7 @@ def build_findings(m):
     h5_note = "只驗相對路徑與同檔 anchor,不驗 http;需要完整 repo"
     if m["sparse_root"] and m["broken_links"]:
         h5_note += ("。⚠️ root 無子目錄且檔案極少——若這是抽出來的單檔 README,"
-                    "相對路徑的死鏈是抽樣假陽性(2026-09-02 實測:16 個命中全部無效)")
+                    "相對路徑的死鏈是抽樣假陽性(教訓與實測見誤判批次報告)")
     f["hygiene"].append({"id": "H-005", "pass": not m["broken_links"],
                          "severity": HYGIENE_SEVERITY["H-005"],
                          "detail": (f"{len(m['broken_links'])} 個死連結:{m['broken_links'][:5]}"
@@ -515,16 +536,31 @@ def selftest():
     assert [(l, t) for l, t, _ in hs] == [(1, "Linux kernel"), (2, "Quick Start")], hs
     assert not extract_headings("intro\n\n---\n"), "空行後的 --- 是分隔線不是底線"
     assert not extract_headings("- item\n---\n"), "列表項後的 --- 不是 setext"
-    assert not extract_headings("| a | b |\n|---|---|\n"), "表格分隔列不是 setext"
+    # ⚠️ 夾具是「表格列 + 裸 ---」:`|---|---|` 本來就不匹配底線 regex,
+    # 拿它當夾具打不到 `^\s*\|` 排除分支(複審 F-13:名字宣稱驗 A、實際驗 B)
+    assert not extract_headings("| a | b |\n---\n"), "表格列後的裸 --- 不是 setext"
     assert extract_headings("<h1 align='center'>Choo</h1>")[0][:2] == (1, "Choo")
     assert not extract_headings("<h1><img src='x.svg'></h1>"), \
         "logo-only 的 HTML h1 沒有文字,不得計為文字標題(留給 LLM 複核)"
     assert not extract_headings("```bash\n# 這是註解不是標題\n```\n"), \
         "fence 內文必須遮罩 —— amplication 的 bash 註解曾被當成 H1"
+    assert not extract_headings("```bash\n# 未閉合 fence 的註解也不是標題\n"), \
+        "未閉合 fence 延伸到檔尾(GitHub 同樣渲染為程式碼)—— 複審 F-10"
+    assert not extract_headings("````md\n```\n# 巢狀範例裡的假標題\n```\n````\n"), \
+        "閉合 fence 須同字元且長度 ≥ 開頭,``` 不得提早關閉 ```` —— 複審 F-10"
     assert extract_headings("---\ntitle: x\n---\n# T\n")[0][:2] == (1, "T"), \
         "frontmatter 的 closing --- 不是 setext 底線"
+    # ⚠️ 鑑別力要件:真標題必須落在兩條 --- **之間** —— 第一版把標題放在
+    # 第二條 --- 之後,塗白與否結果相同,拿掉 YAML 形狀檢查突變不轉紅(當場抓到)
+    hr = extract_headings("---\n\n# T\n\nIntro para\n\n---\nmore\n")
+    assert [(l, t) for l, t, _ in hr] == [(1, "T")], \
+        f"以分隔線開場的 README 不是 frontmatter,不得整段塗白(複審 F-12):{hr}"
     two = extract_headings("A\n===\nB\n===\n")
     assert [(l, t) for l, t, _ in two] == [(1, "A"), (1, "B")], two
+    # ⚠️ 有鑑別力的「底線消耗內容行」夾具:拿掉 `prev = \"\"` 重設,
+    # 第二條底線會再配一次同一內容行 → 產出兩個重複標題(複審 F-14)
+    dup = extract_headings("A\n===\n===\n")
+    assert [(l, t) for l, t, _ in dup] == [(1, "A")], dup
 
     # ── slug 與死連結 ───────────────────────────────────────────────────
     assert github_slug("## 統計限制(必讀)") == "統計限制必讀", github_slug("## 統計限制(必讀)")
@@ -540,12 +576,31 @@ def selftest():
         open(os.path.join(td, "docs", "a.md"), "w", encoding="utf-8").write("x")
         md = ("# T\n\n## 章節\n\nSetext 段\n---------\n\n<a name=\"named_anchor\"></a>\n\n"
               "[ok](docs/a.md) [self](#章節) [dead](docs/nope.md) [anc](#nope) "
-              "[se](#setext-段) [na](#named_anchor)\n"
-              "```md\n[fence 內的假連結](docs/ghost.md)\n```\n")
+              "[se](#setext-段) [na](#named_anchor) [gh](#ghost_anchor)\n"
+              "```md\n[fence 內的假連結](docs/ghost.md)\n<a name=\"ghost_anchor\"></a>\n```\n")
         open(os.path.join(td, "README.md"), "w", encoding="utf-8").write(md)
         bad = broken_links(md, td, "README.md")
-        assert sorted(bad) == ["#nope", "docs/nope.md"], \
-            f"setext 標題與 <a name=> 都是合法 anchor 目標,fence 內連結不掃:{bad}"
+        assert sorted(bad) == ["#ghost_anchor", "#nope", "docs/nope.md"], \
+            (f"setext 標題與 <a name=> 都是合法 anchor 目標;fence 內連結不掃、"
+             f"fence 內的 <a name=> 也**不算目標**(複審 F-09):{bad}")
+        # BOM:read_text 必須剝掉,否則第一行的 ATX H1 與 frontmatter 判定同時失配
+        bp = os.path.join(td, "bom", "README.md")
+        os.makedirs(os.path.dirname(bp))
+        with open(bp, "wb") as f:
+            f.write(b"\xef\xbb\xbf# BomTitle\n")
+        assert analyze(os.path.dirname(bp))["h1"] == "BomTitle", \
+            "UTF-8 BOM 未剝除,第一行 ATX H1 消失(複審 F-11)"
+        # H-002 的 bare-name 語義:H1 = 目錄名 → pass 且 detail 照報事實
+        # (複審 F-03:第一版四個 fixture 沒有一個 H1 等於目錄名,把 pass 邏輯
+        #  改回扣分版全綠 —— 語義半邊零守衛)
+        np_ = os.path.join(td, "acme")
+        os.makedirs(np_)
+        open(os.path.join(np_, "README.md"), "w", encoding="utf-8").write(
+            "# acme\n\n定位句。\n\n## 安裝\nx\n")
+        nf = build_findings(analyze(np_))
+        nh2 = next(h for h in nf["hygiene"] if h["id"] == "H-002")
+        assert nh2["pass"] is True, "H1 等於 repo 名不得扣分(Standard Readme Title 規則)"
+        assert "與 repo 名相同" in nh2["detail"], "bare-name 是要照報的事實,不能靜默"
 
     # ── fence 統計 ──────────────────────────────────────────────────────
     t, g = fence_stats("```py\nx\n```\n\n```\ny\n```\n")
@@ -584,7 +639,8 @@ def selftest():
     assert {v.strip() for v in mv.group(1).split(",")} == set(CRAFT_VERDICT_VALUES), \
         "取值域漂移:rubric 與程式不一致"
     # 門檻常數也要對得上
-    assert "70%" in rub or "70.0" in rub, "H-004 的門檻值在 rubric 裡找不到"
+    assert f"{int(FENCE_LANG_MIN_PCT)}%" in rub or f"{FENCE_LANG_MIN_PCT}" in rub, \
+        "H-004 的門檻值在 rubric 裡找不到(守衛綁 FENCE_LANG_MIN_PCT,改常數不改 rubric 會轉紅)"
 
     # ── 負向:解析器要讀得懂「值」而不是「談論值的註解」───────────────────
     # ⚠️ 註解必須放在**真值之後**才有鑑別力:本解析器逐行 finditer、後者覆蓋前者,
@@ -622,8 +678,6 @@ def selftest():
     assert not _missing, (
         f"這些進入點會印非 ASCII 卻沒有 stdout/stderr 的 reconfigure,"
         f"在 Windows 重導向時會 UnicodeEncodeError:{_missing}")
-    # 同一根因的另外兩種面貌 —— **寫者側修好不等於讀者側也好了**。
-    # 三次 Windows CI 紅燈換來的清單:encode(stdout)、decode(subprocess)、open()。
     # 同一根因的另外兩種面貌 —— **寫者側修好不等於讀者側也好了**。
     # 三次 Windows CI 紅燈換來的清單:encode(stdout)、decode(subprocess)、open()。
     #

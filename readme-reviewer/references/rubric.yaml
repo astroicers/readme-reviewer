@@ -36,8 +36,8 @@ triangulation_sources:
         另:相對連結會依當前 branch 自動轉換(絕對連結在 clone 內可能失效);
         GitHub 依標題自動產生 TOC;anchor 可從渲染後的標題直接複製。
       gap_against_this_rubric: |
-        ⚠️ **後兩項在本 rubric 裡沒有任何維度承載**(R-001/002/003/004 都不判)。
-        已入 misjudgments,**本輪不修**。
+        後兩項原本無維度承載 —— **2026-09-02 批次處理已新增 R-005 承載**
+        (Where users can get help / Who maintains 兩項)。
     - source: "Standard Readme(RichardLitt/standard-readme)spec.md"
       verified: "2026-09-02"
       found: |
@@ -50,10 +50,10 @@ triangulation_sources:
         Contributing:"State where users can ask questions"。
         Maintainers:"List maintainer(s)… along with one way of contacting them"。
       gap_against_this_rubric: |
-        ⚠️ **Title 規則與本 rubric 的 H-002 直接矛盾** —— spec 要求標題等於 repo 名,
-        H-002 正是在扣這個分。已入 misjudgments,**本輪不修**。
+        Title 規則曾與 H-002 直接矛盾(spec 要求標題等於 repo 名,H-002 在扣這個分)
+        —— **2026-09-02 批次處理已撤銷該扣分**(H-002 0.2.0 只報事實)。
         ⚠️ 本 repo 自己的 README 違反 Short Description 的三條規則(定位句在 blockquote 裡)。
-        **那是分歧不是錯誤**(GitHub Docs 無此規定),但引用了就要註明。
+        **那是分歧不是錯誤**(GitHub Docs 無此規定),分歧已在 README 註明。
     - source: "matiassingers/awesome-readme"
       verified: "2026-09-02"
       new_in: "2026-09-02"
@@ -67,8 +67,8 @@ triangulation_sources:
         ⚠️ **但這不足以推翻 R-004**:該策展標準本身高度偏視覺/打包面,
         而姊妹專案的結論正是「打包面關聯星數、不關聯工藝」——
         「偏打包面的標準不提 R-004」既可讀成 R-004 過重,也可讀成該標準沒在看工藝。
-        **兩種讀法資料分不開。** 能寫下的只有:R-004 目前**無外部支持**,
-        而它承擔了實測 12 個 poor 中的 10 個。已入 misjudgments,**本輪不修**。
+        **兩種讀法資料分不開。** 能寫下的只有:R-004 目前**無外部支持**
+        (它在首兩批的觸發集中度見批次報告;decision_order 已於 0.2.0 改寫)。
     - source: "Make a README(makeareadme.com)—— 最小可用 README 的組成"
       verified: null
       note: "⏳ 待查證。憑既有知識引用,中等證據強度。"
@@ -118,7 +118,7 @@ hygiene:
     # 2026-09-02 批次修:撤銷「H1 等於 repo 名」的扣分(與本 rubric 引用的
     # Standard Readme Title 規則直接矛盾),severity 降 info。理由與實測見批次報告。
     known_false_positives: |
-      有些 repo 刻意用 logo 圖片取代 H1(常見於品牌型專案;12 份實測中 5 份)。
+      有些 repo 刻意用 logo 圖片取代 H1(常見於品牌型專案;實測占比見批次報告)。
       偵測看不出「圖片承載了標題功能」——**這一條交給步驟 4 的 LLM 複核**,
       lint 只負責指出「沒有文字 H1」這個事實。
 
@@ -166,7 +166,7 @@ hygiene:
       標題認 ATX / setext / HTML 三種語法,`<a name=>` 與 `id=` 也是合法目標。
     precondition: |
       ⚠️ **需要完整的 repo,不是一個 README 檔。** 只餵單檔時所有相對路徑
-      當然指不到東西 —— 那是抽樣假陽性不是死鏈(2026-09-02 實測:16 個命中全部無效)。
+      當然指不到東西 —— 那是抽樣假陽性不是死鏈(實測教訓見誤判批次報告)。
       lint 在 root 無子目錄且檔案極少時會在 note 裡明說。
 
 # ════════════════════════════════════════════════════════════════════════

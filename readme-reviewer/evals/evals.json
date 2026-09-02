@@ -2,7 +2,7 @@
   "_note": "readme-reviewer 的行為契約。fixture 全部進版控,不依賴外部 clone。",
   "cases": [
     {
-      "name": "good — 四維俱全的 CLI README",
+      "name": "good — 五維俱全的 CLI README",
       "fixture": "good-readme",
       "shape": "cli",
       "expected": {
@@ -17,7 +17,7 @@
           "R-005": "good"
         },
         "craft_verdict": "approved",
-        "teaching_point": "四維全 good 才走到規則 6。它有定位句、前置條件、預期輸出、why 段、非目標段、與帶日期的限制 —— 每一條都對應一個 pass_criteria",
+        "teaching_point": "五維全 good 才走到規則 6。它有定位句、前置條件、預期輸出、why 段、非目標段、與帶日期的限制 —— 每一條都對應一個 pass_criteria",
         "hygiene_pass": {
           "H-001": true,
           "H-002": true,
