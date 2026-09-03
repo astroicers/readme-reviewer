@@ -740,15 +740,15 @@ def selftest():
         fake = os.path.join(td, "README.md")
         open(fake, "w", encoding="utf-8").write("# x\n")
         r = _sp.run([sys.executable, os.path.abspath(__file__), fake],
-                    capture_output=True, text=True)
+                    capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert r.returncode == 2 and "不是目錄" in r.stderr, \
             f"檔案路徑應硬失敗:rc={r.returncode} err={r.stderr[:80]!r}"
         r2 = _sp.run([sys.executable, os.path.abspath(__file__),
-                      os.path.join(td, "no-such-dir")], capture_output=True, text=True)
+                      os.path.join(td, "no-such-dir")], capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert r2.returncode == 2, "不存在路徑應硬失敗"
         empty = os.path.join(td, "empty"); os.makedirs(empty)
         r3 = _sp.run([sys.executable, os.path.abspath(__file__), empty],
-                     capture_output=True, text=True)
+                     capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert r3.returncode == 0 and "缺席型" in r3.stderr, "真目錄無 README 應明示警告"
 
     print("[selftest] lint_readme: 全部通過 ✔"
