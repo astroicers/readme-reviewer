@@ -469,7 +469,15 @@ def main():
         return selftest()
     if not a.repo_dir:
         ap.error("需要 repo 目錄(或 --selftest)")
+    # fails-open 修(fresh 小輪實錘):餵入檔案路徑/不存在路徑時,原版靜默輸出
+    # 缺席型 findings(無 H1/無安裝段),五份相同輸出才被識破。非目錄一律硬失敗。
+    if not os.path.isdir(a.repo_dir):
+        print(f"❌ 不是目錄:{a.repo_dir}(本工具吃 repo 目錄,不吃 README 檔案路徑)",
+              file=sys.stderr)
+        return 2
     m = analyze(a.repo_dir)
+    if m["readme_path"] is None:
+        print("⚠️ 目錄內無 README——以下全部為缺席型 findings,別當成內容判定", file=sys.stderr)
     f = build_findings(m)
     if a.json:
         out = {"repo": a.repo_dir, "readme_path": m["readme_path"],
@@ -725,6 +733,23 @@ def selftest():
                     _enc.append(f"{_rel}:{_i} open() 未指定 encoding")
     assert not _enc, ("這些 I/O 邊界會吃 Windows 的 locale 編碼(cp1252),"
                       f"三次 CI 紅燈都出在這一類:{_enc}")
+
+    # ── fails-open 修的負向 case:非目錄一律硬失敗(fresh 小輪實錘)────────
+    import subprocess as _sp
+    with tempfile.TemporaryDirectory() as td:
+        fake = os.path.join(td, "README.md")
+        open(fake, "w", encoding="utf-8").write("# x\n")
+        r = _sp.run([sys.executable, os.path.abspath(__file__), fake],
+                    capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert r.returncode == 2 and "不是目錄" in r.stderr, \
+            f"檔案路徑應硬失敗:rc={r.returncode} err={r.stderr[:80]!r}"
+        r2 = _sp.run([sys.executable, os.path.abspath(__file__),
+                      os.path.join(td, "no-such-dir")], capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert r2.returncode == 2, "不存在路徑應硬失敗"
+        empty = os.path.join(td, "empty"); os.makedirs(empty)
+        r3 = _sp.run([sys.executable, os.path.abspath(__file__), empty],
+                     capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert r3.returncode == 0 and "缺席型" in r3.stderr, "真目錄無 README 應明示警告"
 
     print("[selftest] lint_readme: 全部通過 ✔"
           f"(rollup 6 規則 + n/a 邊界 + 鍵/值域守衛;"
